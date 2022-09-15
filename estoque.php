@@ -7,36 +7,45 @@ include "php/menu.php";
 //Verifica cessão 
 
 cessao();
-
-// GET categoria
- $sql_code = "SELECT * FROM `categoria`";
- $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
  
  // Registrar produto
 
- if(isset($_POST['nome']) || isset($_POST['estoque']) || isset($_POST['valor_compra']) || isset($_POST['valor_venda']) || isset($_POST['categoria']) || isset($_POST['descricao'])) {
 
-        $nome = clear($_POST['nome']);
+ if (isset($_POST['estoque'])) {
+
+   $id = $_POST['estoque'];
+
+} elseif (isset($_POST['edd_estoque'])) {
+    $id = $_POST['edd_estoque'];
+    if(isset($_POST['nome']) || isset($_POST['estoque']) || isset($_POST['valor_compra']) || isset($_POST['valor_venda']) || isset($_POST['categoria']) || isset($_POST['descricao'])) {
         $estoque = clear($_POST['estoque']);
         $valor_compra = clear($_POST['valor_compra']);
-        $valor_venda = clear($_POST['valor_venda']);
-        $categoria = clear($_POST['categoria']);
-        $descricao = clear($_POST['descricao']);
         $id_user = clear($_SESSION['id']);
 
-
-        $sql_code = "INSERT INTO `estoque`(`Nome`, `valor_venda`, `categoria_id`, `descricao`, `user`) VALUES ('$nome','$valor_venda','$categoria','$descricao','$id_user')";
+        $sql_code = "INSERT INTO `controle_estoque`(`id_estoque`, `valor_compra`, `estoque_metros_quadrados`, `ID_user`) VALUES ($id,$valor_compra,$estoque,$id_user)";
         $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
-        $idsql = $mysqli->insert_id;
-
-        $sql_code = "INSERT INTO `controle_estoque`(`id_estoque`, `valor_compra`, `estoque_metros_quadrados`, `ID_user`) VALUES ('$idsql', '$valor_compra','$estoque','$id_user')";
-        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-
-        $_SESSION['msg'] = '<h2 style="color:green;">Produto cadastrado com sucesso!!!</h2>';
-        header("Location: produtoscadastrados.php");
-
+    }else{
+        
+        echo "Campo vazios";
+    }
+}elseif (isset($_POST['delestoque'])) {
+    $id_del = clear($_POST['delestoque']);
+    $id = clear($_POST['idestoque']);
+    
+    $sql_code = "DELETE FROM `controle_estoque` WHERE `ID` = $id_del";
+    $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+} else {
+    echo "ERRo";
+    $id = 17;
 }
+
+var_dump($_POST['delestoque']);
+$sql_code = "SELECT * FROM `controle_estoque` WHERE `id_estoque` = $id";
+$sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+
+
+
 
 
 ?>
@@ -101,7 +110,7 @@ cessao();
                         <form class="was-validated ">
                             <div class="form-row">
                                 <div class="col-5">
-                                <input type="text" class="form-control" placeholder="City" required>
+                                <input type="text"  class="form-control" placeholder="City" required>
                                 </div>
                                 <div class="col-5">
                                 <input type="text" class="form-control" placeholder="State" required>
@@ -124,29 +133,41 @@ cessao();
                     <!-- Basic Card Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Cadastrar estoque</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Lista de estoque</h6>
                         </div>
                         <div class="card-body">
-                            <h1 > nome </h1>
-                        <form class="was-validated ">
-                            <div class="form-row">
-                                <div class="col-5">
-                                <input type="text" class="form-control" placeholder="City" required>
+                        <?php 
+                        
+                        while($row = $sql_query->fetch_assoc()) {
+                            echo '<h1 >  </h1>
+                            
+                                <div class="form-row">
+                                    <div class="col-5">
+                                    <input type="text" class="form-control" value="'. $row['valor_compra'] .'" disabled>
+                                    </div>
+                                    <div class="col-5">
+                                    <input type="text" class="form-control" value="'. $row['estoque_metros_quadrados'] .'" disabled>
+                                    </div>
+                                    <div class="col">
+                                    <form action="" method="post">
+                                    <input type="text" style="display: none;" name="idestoque" value="'. $row['id_estoque'] .'">
+                                        <button type="submit" class="btn btn-danger" value="'. $row['ID'] .'" name="delestoque">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
+                                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"></path>
+                                            </svg>
+                                            Excluir
+                                        </button>
+                                    </form>    
+                                    </div>
                                 </div>
-                                <div class="col-5">
-                                <input type="text" class="form-control" placeholder="State" required>
-                                </div>
-                                <div class="col">
-                                    <button type="submit" class="btn btn-danger" value="'. $row['ID'] .'" name="edit_produto">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"></path>
-                                        </svg>
-                                        Excluir
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                           ';
+
+                        }
+                        
+                        
+                        ?>
+                            
                                 
                         </div>
                     </div>
