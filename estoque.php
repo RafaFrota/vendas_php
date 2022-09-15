@@ -11,13 +11,13 @@ cessao();
  // Registrar produto
 
 
- if (isset($_POST['estoque'])) {
+ if (isset($_POST['edit_estoque'])) {
 
-   $id = $_POST['estoque'];
+   $id =clear($_POST['edit_estoque']);
 
 } elseif (isset($_POST['edd_estoque'])) {
     $id = $_POST['edd_estoque'];
-    if(isset($_POST['nome']) || isset($_POST['estoque']) || isset($_POST['valor_compra']) || isset($_POST['valor_venda']) || isset($_POST['categoria']) || isset($_POST['descricao'])) {
+    if(isset($_POST['estoque']) || isset($_POST['valor_compra'])) {
         $estoque = clear($_POST['estoque']);
         $valor_compra = clear($_POST['valor_compra']);
         $id_user = clear($_SESSION['id']);
@@ -40,7 +40,7 @@ cessao();
     $id = 17;
 }
 
-var_dump($_POST['delestoque']);
+
 $sql_code = "SELECT * FROM `controle_estoque` WHERE `id_estoque` = $id";
 $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
@@ -107,16 +107,16 @@ $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQ
                         </div>
                         <div class="card-body">
                             <h1 > nome </h1>
-                        <form class="was-validated ">
+                        <form class="was-validated" action="" method="post">
                             <div class="form-row">
                                 <div class="col-5">
-                                <input type="text"  class="form-control" placeholder="City" required>
+                                <input type="number"  class="form-control" placeholder="City" name="valor_compra" required>
                                 </div>
                                 <div class="col-5">
-                                <input type="text" class="form-control" placeholder="State" required>
+                                <input type="number" class="form-control" placeholder="State" name="estoque" required>
                                 </div>
                                 <div class="col">
-                                    <button type="submit" class="btn btn-success" value="'. $row['ID'] .'" name="edit_produto">
+                                    <button type="submit" class="btn btn-success" value="<?php echo $id ?>" name="edd_estoque">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
                                             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"></path>
