@@ -1,8 +1,12 @@
 <?php 
 
+include "php/conexao.php";
+include "php/funcoes.php";
+
+
+//Verifica cessão 
+cessao();
 include "php/menu.php";
-
-
 ?>
 
 <!DOCTYPE html>
@@ -35,9 +39,6 @@ include "php/menu.php";
     <div id="wrapper">
 
         <?php echo $menu_lateal; ?>
-
-
-
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">

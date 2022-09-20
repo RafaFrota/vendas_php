@@ -2,13 +2,13 @@
 
 include "php/conexao.php";
 include "php/funcoes.php";
-include "php/menu.php";
+
 
 //Verifica cessão 
-
 cessao();
+include "php/menu.php";
 
- // DEL categoria
+// DEL categoria
 
  if (isset($_POST['delete'])) {
     $id_del = $_POST['delete'];

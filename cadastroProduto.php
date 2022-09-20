@@ -2,11 +2,11 @@
 
 include "php/conexao.php";
 include "php/funcoes.php";
-include "php/menu.php";
+
 
 //Verifica cessão 
-
 cessao();
+include "php/menu.php";
 
 // GET categoria
  $sql_code = "SELECT * FROM `categoria`";

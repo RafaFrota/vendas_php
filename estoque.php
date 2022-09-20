@@ -2,11 +2,11 @@
 
 include "php/conexao.php";
 include "php/funcoes.php";
-include "php/menu.php";
+
 
 //Verifica cessão 
-
 cessao();
+include "php/menu.php";
  
  // Registrar produto
 
@@ -36,7 +36,7 @@ cessao();
     $sql_code = "DELETE FROM `controle_estoque` WHERE `ID` = $id_del";
     $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 } else {
-    echo "ERRo";
+
     $id = 17;
 }
 
@@ -44,9 +44,10 @@ cessao();
 $sql_code = "SELECT * FROM `controle_estoque` WHERE `id_estoque` = $id";
 $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
+$sql_code = "SELECT `ID`, `Nome` FROM `estoque` WHERE ID = $id";
+$sql_query_nome = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
-
-
+$nome = $sql_query_nome->fetch_assoc();
 
 ?>
 
@@ -106,14 +107,16 @@ $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQ
                             <h6 class="m-0 font-weight-bold text-primary">Cadastrar estoque</h6>
                         </div>
                         <div class="card-body">
-                            <h1 > nome </h1>
+                            <h1 > <?php echo $nome['Nome'] ?> </h1>
                         <form class="was-validated" action="" method="post">
                             <div class="form-row">
                                 <div class="col-5">
-                                <input type="number"  class="form-control" placeholder="City" name="valor_compra" required>
+                                <label for="validationcompra">Estoque</label>
+                                <input type="number"  class="form-control" placeholder="Valor da Compra" id="validationcompra" name="valor_compra" required>
                                 </div>
                                 <div class="col-5">
-                                <input type="number" class="form-control" placeholder="State" name="estoque" required>
+                                <label for="validationestoque">Estoque</label>
+                                <input type="number" class="form-control" placeholder="Estoque" id="validationestoque" name="estoque" required>
                                 </div>
                                 <div class="col">
                                     <button type="submit" class="btn btn-success" value="<?php echo $id ?>" name="edd_estoque">
