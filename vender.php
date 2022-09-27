@@ -10,32 +10,46 @@ include "php/menu.php";
  
  // Registrar produto
 
- if(isset($_POST['nome']) || isset($_POST['estoque']) || isset($_POST['valor_compra']) || isset($_POST['valor_venda']) || isset($_POST['categoria']) || isset($_POST['descricao'])) {
-
-        $nome = clear($_POST['nome']);
-        $estoque = clear($_POST['estoque']);
-        $valor_compra = clear($_POST['valor_compra']);
-        $valor_venda = clear($_POST['valor_venda']);
-        $categoria = clear($_POST['categoria']);
-        $descricao = clear($_POST['descricao']);
+ if(isset($_POST['cliente']) && isset($_POST['produto']) && isset($_POST['valormetro']) && isset($_POST['quantidademetros']) && isset($_POST['oppagamento']) && isset($_POST['statuspagamento']) ) {
+        
+        $cliente = clear($_POST['cliente']);
+        $produto = clear($_POST['produto']);
+        $valormetro = clear($_POST['valormetro']);
+        $quantidademetros = clear($_POST['quantidademetros']);
+        $oppagamento = clear($_POST['oppagamento']);
+        $statuspagamento = clear($_POST['statuspagamento']);
+        if (isset($_POST['pagamento'])) {
+            $pagamento = clear($_POST['pagamento']);
+        }else {
+            $pagamento = 0;
+        }
+        
         $id_user = clear($_SESSION['id']);
 
 
-        $sql_code = "INSERT INTO `estoque`(`Nome`, `valor_venda`, `categoria_id`, `descricao`, `user`) VALUES ('$nome','$valor_venda','$categoria','$descricao','$id_user')";
-        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+        $sql_code = "INSERT INTO `venda`(`cliente`, `produto`, `valormetro`, `quantidademetros`, `formaDePagamento`, `statusPagamento`, `ID_user`) VALUES ( $cliente,$produto,$valormetro,$quantidademetros,$oppagamento,$statuspagamento,$id_user)";
+        //echo $sql_code;
+        //$sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
-        $idsql = $mysqli->insert_id;
-
-        $sql_code = "INSERT INTO `controle_estoque`(`id_estoque`, `valor_compra`, `estoque_metros_quadrados`, `ID_user`) VALUES ('$idsql', '$valor_compra','$estoque','$id_user')";
-        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-
-        $_SESSION['msg'] = '<h2 style="color:green;">Produto cadastrado com sucesso!!!</h2>';
-        header("Location: produtoscadastrados.php");
+        //$idsql = $mysqli->insert_id;
+           
+            
+           
+            
+        if(isset($_POST['Profissional']) && isset($_POST['descricao']) && isset($_POST['valservico']) && isset($_POST['check'])) {
+            
+            
+            $valservico = clear($_POST['valservico']);
+            $Profissional = clear($_POST['Profissional']);
+            $descricao = clear($_POST['descricao']);
+            $sql_code = "INSERT INTO `servicovenda`(`profissional`, `valservico`, `descricao`, `user_id`) VALUES ($Profissional, $valservico,'$descricao', $id_user)";
+            
+        }
 
 }
  // Registrar cliente
 
- if(isset($_POST['nomecliente']) || isset($_POST['email']) || isset($_POST['celular']) || isset($_POST['cep']) || isset($_POST['endereco'])) {
+ if(isset($_POST['nomecliente']) && isset($_POST['email']) && isset($_POST['celular']) && isset($_POST['cep']) && isset($_POST['endereco'])) {
 
     $nome = clear($_POST['nomecliente']);
     $email= clear($_POST['email']);
@@ -127,7 +141,7 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                     <h6 class="m-0 font-weight-bold text-primary"> Cliente </h6>
                                 </a>
                                 <!-- Card Content - Collapse -->
-                                <div class="collapse show" id="cliente">
+                                <div class="collapse" id="cliente">
                                     <div class="card-body">
                                     <form class="was-validated " action="" method="POST">
                                         <div class="form-row">
@@ -178,7 +192,7 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                         <div class="form-row">
                                             <div class="form-group col-md-6">
                                                 <label for="validationCustom02">Cliente</label>
-                                                <select class="custom-select" name="categoria" required>
+                                                <select class="custom-select" name="cliente" required>
                                                     <option value="">---</option>
                                                     
                                                     <?php 
@@ -209,11 +223,11 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                         <div class="form-row">
                                                 <div class="col-md-6 mb-3">
                                                         <label for="valor_produto">Valor do metro quadrado: </label>
-                                                        <input type="text" class="form-control" value="" id="valor_produto" placeholder="Valor do produto" name="nomecliente" required>
+                                                        <input type="text" class="form-control" value="" id="valor_produto" placeholder="Valor do produto" name="valormetro" required>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                        <label for="metros">: </label>
-                                                        <input type="text" class="form-control" value="" id="metros" placeholder="Metros" name="nomecliente" required>
+                                                        <label for="metros">Quantidade: </label>
+                                                        <input type="text" class="form-control" value="" id="metros" placeholder="Metros" name="quantidademetros" required>
                                                 </div>
                                             </div>
 
@@ -221,21 +235,21 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                                 
                                         
                                         <div class="form-check form-switch mt-2 mb-3">
-                                                <input class="form-check-input" type="checkbox" id='btn-div' require>
+                                                <input class="form-check-input" type="checkbox" name="check" id='btn-div' value="1">
                                                 <label for="flexSwitchCheckDefault">Gerar ordem de serviço?</label>
                                         </div>
                                                   
                                         
-                                        <div class="container-servico " style="display: none;">
+                                        <div class="container-servico" style="display: none;">
                                             
                                             <div class="form-row">
                                                 <div class="col-md-12 mb-3">
-                                                        <label for="valor_servico">Valor do serviço: </label>
-                                                        <input type="text" class="form-control" id="valor_servico" placeholder="Valor recebido" name="nomecliente" required>
+                                                        <label for="valservico" >Valor do serviço: </label>
+                                                        <input type="text" class="form-control" id="valservico" placeholder="Valor recebido" name="valservico" >
                                                 </div>
                                                 <div class="col-md-12 mb-3">
                                                     <label for="Profissional">Profissional responsavel: </label>
-                                                    <select class="custom-select" name="Profissional" required>
+                                                    <select class="custom-select" name="Profissional" id="responsavel">
                                                         <option value="">---</option>
                                                         
                                                         <?php 
@@ -250,8 +264,8 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                             </div>
                                             <div class="form-row">
                                                 <div class="col-md-12 mb-3">
-                                                    <label for="exampleFormControlTextarea1"> Descrição do Serviço </label>
-                                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="descricao" required></textarea>
+                                                    <label for="desc"> Descrição do Serviço </label>
+                                                    <textarea class="form-control" id="desc" rows="3" name="descricao" ></textarea>
                                                 </div>
                                             </div>
 
@@ -261,7 +275,7 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                         <div class="form-row">
                                                 <div class="form-group col-md-6">
                                                     <label for="validationCustom02">Forma de pagamento: </label>
-                                                        <select class="custom-select" name="categoria" required>
+                                                        <select class="custom-select" name="oppagamento" required>
                                                             <option value="">---</option>
                                                             <option value="1">A vista</option>
                                                             <option value="2">Cartão de credito</option>
@@ -272,7 +286,7 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                                 
                                                 <div class="form-group col-md-6 ">
                                                     <label for="pagamento">Pagamentos</label>
-                                                        <select class="custom-select" name="pagamento" id="pagamento" required>
+                                                        <select class="custom-select" name="statuspagamento" id="pagamento" required>
                                                             <option value="">---</option>
                                                             <option value="1">Pagamento efetuado</option>
                                                             <option value="2">Pagamento parcial</option>
@@ -283,15 +297,18 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                             <div class="form-row container-pagamento" style="display: none;">
                                                 <div class="col-md-12 mb-3">
                                                         <label for="valor-recebido">Valor recebido: </label>
-                                                        <input type="text" class="form-control" id="valor-recebido" placeholder="Valor recebido" name="nomecliente" required>
+                                                        <input type="text" class="form-control" id="valor-recebido" placeholder="Valor recebido" name="pagamento" >
                                                 </div>
                                             </div>                
-                                        <div id="total"><h5 style="color: rgba(255, 0, 0, 0.69);">Total produto R$00,00</h5></div>
+                                        
+                                        
+                                        
+                                        <div id="total_areceber"></div>
                                         <div id="total_servico" ></div>
                                         <div id="total_recebido" ></div>
-                                        <div id="total_areceber"></div>
+                                        <div id="total"></div>
                                         
-                                        <button class="btn btn-primary" type="button"> Cadastrar </button>
+                                        <button class="btn btn-primary" type="submit"> Cadastrar </button>
                                     </form>
                                     </div>
                                 </div>
@@ -369,24 +386,31 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
 //----------------------------------------------------
 var btn = document.getElementById('btn-div');
 var container = document.querySelector('.container-servico');
+var valservico = document.querySelector('#valservico');
+var responsavel = document.querySelector('#responsavel');
+var desc = document.querySelector('#desc');
+
+serv = false;
+val_par = false;
 
 btn.addEventListener('change', function() {
     
   if(container.style.display === 'block') {
-        var produto = document.querySelector("#valor_produto").value;
-        var metros = document.querySelector("#metros").value;
-        var valor_pago = document.querySelector("#valor-recebido").value;
-        var valor_servico = document.querySelector("#valor_servico").value;
-
-        var result = (metros * produto) - valor_pago;
-
-        document.querySelector("#total_servico").innerHTML = '';
-        document.querySelector("#total_areceber").innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);">Recebido R$ '+result+'</h5>';
+        serv = true;
+        calcula();
         container.style.display = 'none';
+        valservico.removeAttribute('required');
+        responsavel.removeAttribute('required');
+        desc.removeAttribute('required');
     } else {
       container.style.display = 'block';
       
-   
+        valservico.setAttribute('required', '');
+        responsavel.setAttribute('required', '');
+        desc.setAttribute('required', '');
+      container.setAttribute('required', '');
+      serv = false;
+      calcula();
   }
 });
 
@@ -396,53 +420,38 @@ var inp_valor = document.getElementById('valor-recebido');
 
 inp_valor.addEventListener('change', function() {
     
-    console.log(inp_valor.value);
-
-    var produto = document.querySelector("#valor_produto").value;
-    var metros = document.querySelector("#metros").value;
-    var valor_pago = document.querySelector("#valor-recebido").value;
-
-    var result = (metros * produto) - valor_pago;
-
-    document.querySelector("#total_recebido").innerHTML = '<h5 style="color: rgba(38, 190, 37, 0.75);">Recebido R$ '+valor_pago+'</h5>';
-    document.querySelector("#total_areceber").innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);">Valor à receber R$ '+result+'</h5>';
+    calcula();
     
   });
 
 
 //----------------------------------------------------
-var inp_valor = document.getElementById('valor_servico');
+var inp_valor = document.getElementById('valservico');
 
 inp_valor.addEventListener('change', function() {
     
-    console.log(inp_valor.value);
-
-    var produto = document.querySelector("#valor_produto").value;
-    var metros = document.querySelector("#metros").value;
-    var valor_pago = document.querySelector("#valor-recebido").value;
-    var valor_servico = document.querySelector("#valor_servico").value;
-
-    var result = (metros * produto) + valor_servico - valor_pago;
-
-    
-    //document.querySelector("#total_areceber").innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);">Valor à receber R$ '+result+'</h5>';
-    document.querySelector("#total_servico").innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);">Valor do serviço R$ '+valor_servico+'</h5>';
+   calcula();
     
   });
 
 //----------------------------------------------------
 var btn_pagamento = document.getElementById('pagamento');
 var container_pagamento = document.querySelector('.container-pagamento');
+var valor_recebido = document.querySelector('#valor-recebido');
 
 btn_pagamento.addEventListener('change', function() {
     
     console.log(btn_pagamento.value);
     if (btn_pagamento.value == 2) {
         container_pagamento.style.display = 'block';
+        valor_recebido.setAttribute('required', '');
+        val_par = false;
+        calcula();
     }else{
         container_pagamento.style.display = 'none';
-        document.querySelector("#total_recebido").innerHTML = '';
-        document.querySelector("#total_areceber").innerHTML = '';
+        valor_recebido.removeAttribute('required');
+        val_par = true;
+        calcula();
     }
     
   });
@@ -483,16 +492,45 @@ btn_pagamento.addEventListener('change', function() {
 
             });
 
-        function calcula(){
+        function calcula(op){
                 
-                // 1 m2 = R$10
-                var produto = document.querySelector("#valor_produto").value;
-                var metros = document.querySelector("#metros").value;
+                
+            var produto = parseFloat(document.querySelector("#valor_produto").value);
+            var metros = parseFloat(document.querySelector("#metros").value);
+            var valor_pago = parseFloat(document.querySelector("#valor-recebido").value);
+            var valservico = parseFloat(document.querySelector("#valservico").value);
+            
+            if (isNaN(produto)) {
+                produto = 0;
+            }
+            
+            if(isNaN(metros)) {
+                metros = 0;
+            }
+            
+            if(isNaN(valor_pago)) {
+                valor_pago = 0;
+            }
+            
+            if (isNaN(valservico)) {
+                valservico = 0;
+            }
+            
+            if (serv) {
+                valservico = 0;
+            }
+            
+            if (val_par) {
+                valor_pago = 0;
+            }
+            
+            var result = (produto * metros) + valservico - valor_pago;
+            
+            document.querySelector('#total_areceber').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> '+ produto +' </h5>';
+            document.querySelector('#total_servico').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> '+ valservico +' </h5>';
+            document.querySelector('#total_recebido').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> '+ valor_pago +' </h5>';
+            document.querySelector('#total').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> '+ result +' </h5>';
 
-                var result = metros * produto;
-                
-                var value = document.querySelector("#total").innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);">Total produto R$'+ result+'</h5>';
-        
         }
 </script>
 
