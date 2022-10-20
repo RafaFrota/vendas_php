@@ -28,19 +28,23 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
 
             $_SESSION['id'] = $usuario['ID'];
             $_SESSION['nome'] = $usuario['nome'];
+            $_SESSION['adm'] = $usuario['acesso'];
 
            
-
-            header("Location: index.php");
+            if ($_SESSION['adm'] == 1) {
+                header("Location: index.php");
+            }else if($_SESSION['adm'] == 2){
+                header("Location: servicoativo.php");
+            }else{
+                header("Location: login.php");
+                echo $_SESSION['adm'];
+            }
 
         } else {
             echo "Falha ao logar! E-mail ou senha incorretos";
         }
-
     }
-
 }
-
 
 ?>
 

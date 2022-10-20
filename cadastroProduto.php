@@ -5,7 +5,7 @@ include "php/funcoes.php";
 
 
 //Verifica cessão 
-cessao();
+cessao(1);
 include "php/menu.php";
 
 // GET categoria
@@ -63,8 +63,11 @@ include "php/menu.php";
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
+    
+
 </head>
 
+  
 <body id="page-top">
 
     <!-- Page Wrapper -->
@@ -100,28 +103,28 @@ include "php/menu.php";
                             <form class="was-validated " action="" method="POST">
                             <div class="form-row">
                                 <div class="col-md-12 mb-3">
-                                        <label for="validationCustom01">Nome</label>
-                                        <input type="text" class="form-control" id="validationCustom01" placeholder="nome" name="nome" required>
+                                        <label for="validationCustom01">Nome:</label>
+                                        <input type="text" class="form-control" id="validationCustom01" placeholder="Digite o nome do produto" name="nome" required>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="validationCustom02">Estoque</label>
-                                    <input type="number" class="form-control" id="validationCustom02" placeholder="estoque" name="estoque" required>
+                                    <label for="validationCustom02">Estoque em m³:</label>
+                                    <input type="text" class="form-control" id="validationCustom02" placeholder="Estoque em m³" name="estoque" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="validationCustom03">Valor compra</label>
-                                    <input type="number" class="form-control" id="validationCustom03" placeholder="valor compra" name="valor compra" required>
+                                    <label for="validationCustom03">Valor da compra:</label>
+                                    <input type="text" class="form-control" id="validationCustom03" placeholder="valor compra" name="valor compra" required>
                                 </div>
                                 
                             </div>
                             <div class="form-row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="validationCustom04">Valor venda</label>
-                                    <input type="number" class="form-control" id="validationCustom04" placeholder="valor venda" name="valor venda" required>
+                                    <label for="valorvanda">Valor da venda:</label>
+                                    <input type="text" class="form-control" id="valorvanda" placeholder="valor venda" name="valor venda" required>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="validationCustom02">Categoria</label>
+                                    <label for="validationCustom02">Categoria:</label>
                                     <select class="custom-select" name="categoria" required>
                                     <option value="">---</option>
                                     
@@ -137,7 +140,7 @@ include "php/menu.php";
                             </div>
                                 
                                 <div class="form-group">
-                                    <label for="exampleFormControlTextarea1">Example textarea</label>
+                                    <label for="exampleFormControlTextarea1">Descrição do produto:</label>
                                     <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="descricao" required></textarea>
                                 </div>
                                 <button class="btn btn-primary" type="submit"> Cadastrar </button>
@@ -174,25 +177,7 @@ include "php/menu.php";
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php echo $LogoutModal ?>
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
@@ -210,6 +195,30 @@ include "php/menu.php";
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
+
+    <script src="js/jquery.mask.js" type="text/javascript"></script>
+    <script src="js/jquery.maskMoney.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#valorvanda').maskMoney({
+              prefix:'R$ ',
+              allowNegative: true,
+              thousands:'.', decimal:',',
+              affixesStay: true
+            });
+            $('#validationCustom03').maskMoney({
+              prefix:'R$ ',
+              allowNegative: true,
+              thousands:'.', decimal:',',
+              affixesStay: true
+            });
+            $('#validationCustom02').mask("0000000000,00 m³", { "escapeChar": "m³", reverse: true });
+            
+            
+            // console.log("Aqui");
+            // $("#valorvanda").mask('000.000.000.000.000,00', {reverse: true, "escapeChar": "\\"});
+        });
+    </script>
 
 </body>
 

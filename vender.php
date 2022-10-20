@@ -5,61 +5,149 @@ include "php/funcoes.php";
 
 
 //Verifica cessão 
-cessao();
+cessao(1);
 include "php/menu.php";
  
  // Registrar produto
-
+ $msg = "";
  if(isset($_POST['cliente']) && isset($_POST['produto']) && isset($_POST['valormetro']) && isset($_POST['quantidademetros']) && isset($_POST['oppagamento']) && isset($_POST['statuspagamento']) ) {
         
         $cliente = clear($_POST['cliente']);
         $produto = clear($_POST['produto']);
         $valormetro = clear($_POST['valormetro']);
         $quantidademetros = clear($_POST['quantidademetros']);
+        $quantidademetros_BD = $quantidademetros;
         $oppagamento = clear($_POST['oppagamento']);
         $statuspagamento = clear($_POST['statuspagamento']);
-        if (isset($_POST['pagamento'])) {
-            $pagamento = clear($_POST['pagamento']);
-        }else {
-            $pagamento = 0;
-        }
-        
         $id_user = clear($_SESSION['id']);
-
-
-        $sql_code = "INSERT INTO `venda`(`cliente`, `produto`, `valormetro`, `quantidademetros`, `formaDePagamento`, `statusPagamento`, `ID_user`) VALUES ( $cliente,$produto,$valormetro,$quantidademetros,$oppagamento,$statuspagamento,$id_user)";
+        $pagamento = 0;
+        $pagamento_serv = 0;
+        
+        $sql_code = "SELECT SUM(valor_compra), SUM(estoque_metros_quadrados) FROM `controle_estoque` WHERE id_estoque = $produto";
+        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
         //echo $sql_code;
-        //$sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+        $soma_estoque = $sql_query->fetch_assoc();
 
-        //$idsql = $mysqli->insert_id;
-           
+        if($quantidademetros <= $soma_estoque['SUM(estoque_metros_quadrados)'] && $quantidademetros > 0 ){
             
-           
+            if (isset($_POST['pagamento']) && $_POST['pagamento'] != '' && $statuspagamento == 2) {
             
-        if(isset($_POST['Profissional']) && isset($_POST['descricao']) && isset($_POST['valservico']) && isset($_POST['check'])) {
-            
-            
-            $valservico = clear($_POST['valservico']);
-            $Profissional = clear($_POST['Profissional']);
-            $descricao = clear($_POST['descricao']);
-            $sql_code = "INSERT INTO `servicovenda`(`profissional`, `valservico`, `descricao`, `user_id`) VALUES ($Profissional, $valservico,'$descricao', $id_user)";
-            
-        }
+                $valor_total = $valormetro * $quantidademetros;
+                if ($_POST['pagamento'] <= $valor_total) {
+                    $pagamento = clear($_POST['pagamento']);
+                }else{
+                    
+                    $pagamento = $valormetro * $quantidademetros;
+                    $pagamento_serv = clear($_POST['pagamento']) - $pagamento;
+                }
+    
+            }else if ($statuspagamento == 1 && $quantidademetros != 0){
+                $pagamento = $valormetro * $quantidademetros;
+            }else if ($quantidademetros == 0){
+                $pagamento = $quantidademetros;
+            }
+    
+            $calc = $pagamento + $pagamento_serv;
+    
+            if ($calc <= $_POST['pagamento'] && $_POST['pagamento'] > 0 or $statuspagamento == 1 or $statuspagamento == 2 or $statuspagamento == 3) {
+                $controle = TRUE;
+                //$estoque = 30;
+                do{
+                    $sql_code = "SELECT `estoque_metros_quadrados` FROM `controle_estoque` WHERE `id_estoque` = $produto LIMIT 1";
+                    //echo $sql_code . " </br>";
+                    $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+                    $estoque = $sql_query->fetch_assoc();
+                    $result = $estoque['estoque_metros_quadrados'] - $quantidademetros;
+                    if ($result < 0){
 
+                        $sql_code = "DELETE FROM `controle_estoque` LIMIT 1";
+                        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+                        $quantidademetros =- $result; 
+                        
+                    }else if ($result == 0){
+                        $sql_code = "DELETE FROM `controle_estoque` LIMIT 1";
+                        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+                        $controle = FALSE;
+                        $quantidademetros =- $result; 
+                        
+                    }else if($result > 0){
+
+                        $sql_code = "UPDATE `controle_estoque` SET `estoque_metros_quadrados`= $result LIMIT 1";
+                        
+                        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+                        $quantidademetros =- $result; 
+                        $controle = FALSE;
+                    }else {
+                        $controle = FALSE;
+                    }
+
+                }while($controle);
+
+                if ($quantidademetros <= 0) {
+                    $sql_code = "INSERT INTO `venda`(`cliente`, `produto`, `valormetro`, `quantidadeMetros`, `formaDePagamento`, `statusPagamento`, `pagamento`, `user_ID`) VALUES ($cliente,$produto,$valormetro,$quantidademetros_BD,$oppagamento,$statuspagamento,$pagamento,$id_user)";
+                    $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+                        
+                    $idsql = $mysqli->insert_id;
+                                        
+                    if(isset($_POST['Profissional']) && isset($_POST['descricao']) && isset($_POST['valservico']) && isset($_POST['check']) && $idsql != 0) {
+                            
+                        if ($statuspagamento == 1){
+                            $pagamento_serv = clear($_POST['valservico']);
+                        }
+                            
+                        $valservico = clear($_POST['valservico']);
+                        $Profissional = clear($_POST['Profissional']);
+                        $descricao = clear($_POST['descricao']);
+                        $sql_code = "INSERT INTO `servicovenda`(`profissional`, `descricao`, `valServico`, `valorPago`, `venda_ID`) VALUES ($Profissional, '$descricao',$valservico, $pagamento_serv, $idsql)";
+                        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+                            
+                        }
+                        
+                    }else {
+                        $msg = "Algo errado com o pagamento";
+                        echo $result;
+                    }
+                }
+                
+        }else {
+            $msg = "ERRO!! Estoque atual é " . $soma_estoque['SUM(estoque_metros_quadrados)'] ."m², insira um valor valido";
+        } 
 }
  // Registrar cliente
 
- if(isset($_POST['nomecliente']) && isset($_POST['email']) && isset($_POST['celular']) && isset($_POST['cep']) && isset($_POST['endereco'])) {
-
+ if(isset($_POST['nomecliente'])) {
+    
     $nome = clear($_POST['nomecliente']);
-    $email= clear($_POST['email']);
-    $celular = clear($_POST['celular']);
-    $cep = clear($_POST['cep']);
-    $endereco = clear($_POST['endereco']);
+    if (empty($_POST['email'])) {
+        $email="";
+    }else {
+        $email= clear($_POST['email']);
+    }
+
+    if (empty($_POST['celular'])) {
+        $celular = 0;
+    }else{
+        $celular = clear($_POST['celular']);
+    }
+
+    if (empty($_POST['celular'])) {
+        $cep = 0;
+    }else{
+        $cep = clear($_POST['cep']);
+    }
+
+    if (empty($_POST['endereco'])) {
+        $endereco = "";
+    }else{
+        $endereco = clear($_POST['endereco']);
+    }
+    
     $id_user = clear($_SESSION['id']);
+    
 
 
     $sql_code = "INSERT INTO `cliente`( `nome`, `email`, `celular`, `cep`, `endereco`, `criado_por`) VALUES ('$nome','$email',$celular,$cep,'$endereco',$id_user)";
+    echo $sql_code;
     $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
 }
@@ -157,7 +245,7 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="celular">Celular: </label>
-                                                <input type="number" class="form-control" id="celular" placeholder="(99) 9999-9999" name="celular" required>
+                                                <input type="number" class="form-control" id="celular" placeholder="(99) 9999-9999" name="celular" >
                                             </div>
                                             
                                         </div>
@@ -169,7 +257,7 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                             
                                             <div class="col-md-6 mb-3">
                                                 <label for="endereco">Endereço: </label>
-                                                <input type="number" class="form-control" id="endereco" placeholder="Endereco" name="endereco" required>
+                                                <input type="number" class="form-control" id="endereco" placeholder="Endereco" name="endereco" >
                                             </div>
                                         </div>    
                                         <button class="btn btn-primary" type="submit"> Cadastrar </button>
@@ -188,6 +276,12 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                 <!-- Card Content - Collapse -->
                                 <div class="collapse show" id="vender">
                                     <div class="card-body">
+                                        <h4>
+                                            <?php 
+                                                echo $msg;
+                                                $msg = "";
+                                            ?>
+                                        </h4>
                                     <form class="was-validated " action="" method="POST">
                                         <div class="form-row">
                                             <div class="form-group col-md-6">
@@ -222,12 +316,12 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                         </div>
                                         <div class="form-row">
                                                 <div class="col-md-6 mb-3">
-                                                        <label for="valor_produto">Valor do metro quadrado: </label>
-                                                        <input type="text" class="form-control" value="" id="valor_produto" placeholder="Valor do produto" name="valormetro" required>
+                                                        <label for="valor_produto">Valor do m² </label>
+                                                        <input type="number" min="0.00" max="10000.00" step="0.01" class="form-control" value="" id="valor_produto" placeholder="Valor do produto" name="valormetro" required>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                        <label for="metros">Quantidade: </label>
-                                                        <input type="text" class="form-control" value="" id="metros" placeholder="Metros" name="quantidademetros" required>
+                                                        <label for="metros">Quantidade em m²</label>
+                                                        <input type="number" class="form-control" value="" id="metros" placeholder="Metros" name="quantidademetros" required>
                                                 </div>
                                             </div>
 
@@ -245,7 +339,7 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                             <div class="form-row">
                                                 <div class="col-md-12 mb-3">
                                                         <label for="valservico" >Valor do serviço: </label>
-                                                        <input type="text" class="form-control" id="valservico" placeholder="Valor recebido" name="valservico" >
+                                                        <input type="number" min="0.00" max="10000.00" step="0.01" class="form-control" id="valservico" placeholder="Valor recebido" name="valservico" >
                                                 </div>
                                                 <div class="col-md-12 mb-3">
                                                     <label for="Profissional">Profissional responsavel: </label>
@@ -293,11 +387,11 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                                             <option value="3">Pagamento pendente</option>
                                                         </select>
                                                 </div>
-                                            </div>
+                                        </div>
                                             <div class="form-row container-pagamento" style="display: none;">
                                                 <div class="col-md-12 mb-3">
                                                         <label for="valor-recebido">Valor recebido: </label>
-                                                        <input type="text" class="form-control" id="valor-recebido" placeholder="Valor recebido" name="pagamento" >
+                                                        <input type="number" min="0.00" max="10000.00" step="0.01" class="form-control" id="valor-recebido" placeholder="Valor recebido" name="pagamento" >
                                                 </div>
                                             </div>                
                                         
@@ -344,25 +438,7 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php echo $LogoutModal ?>
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
@@ -525,11 +601,12 @@ btn_pagamento.addEventListener('change', function() {
             }
             
             var result = (produto * metros) + valservico - valor_pago;
+            var total_produt = produto * metros;
             
-            document.querySelector('#total_areceber').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> '+ produto +' </h5>';
-            document.querySelector('#total_servico').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> '+ valservico +' </h5>';
-            document.querySelector('#total_recebido').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> '+ valor_pago +' </h5>';
-            document.querySelector('#total').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> '+ result +' </h5>';
+            document.querySelector('#total_areceber').innerHTML = '<h5> Total produto: R$'+ total_produt +' </h5>';
+            document.querySelector('#total_servico').innerHTML = '<h5> Total serviço: R$'+ valservico +' </h5>';
+            document.querySelector('#total_recebido').innerHTML = '<h5 style="color: rgba(15, 191, 2, 0.8);"> Valor pago: R$ '+ valor_pago +' </h5>';
+            document.querySelector('#total').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> Total: R$'+ result +' </h5>';
 
         }
 </script>

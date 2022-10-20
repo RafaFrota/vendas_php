@@ -11,13 +11,19 @@ function clear($input){
 
 }
 
-function cessao(){
+function cessao($nivel_cesso){
 
     if(!isset($_SESSION)) {
         session_start();
     }
     
     if(!isset($_SESSION['id'])) {
+        header("Location: login.php");
+    }
+    
+    // Nivel 1 - ADM
+    // Nivel 2 - user
+    if($nivel_cesso < $_SESSION['adm']) {
         header("Location: login.php");
     }
 

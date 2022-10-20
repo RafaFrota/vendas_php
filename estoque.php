@@ -5,7 +5,7 @@ include "php/funcoes.php";
 
 
 //Verifica cessão 
-cessao();
+cessao(1);
 include "php/menu.php";
  
  // Registrar produto
@@ -98,8 +98,8 @@ $nome = $sql_query_nome->fetch_assoc();
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-                <h1 class="h3 mb-2 text-gray-800">Cadastro de produtos</h1>
-                    <p class="mb-4"> Aqui você pode cadastrar novos produtos.</p>
+                <h1 class="h3 mb-2 text-gray-800">Cadastro de estoque</h1>
+                    <p class="mb-4"> Aqui você pode cadastrar o estoque.</p>
                     
                     <!-- Basic Card Example -->
                     <div class="card shadow mb-4">
@@ -107,19 +107,19 @@ $nome = $sql_query_nome->fetch_assoc();
                             <h6 class="m-0 font-weight-bold text-primary">Cadastrar estoque</h6>
                         </div>
                         <div class="card-body">
-                            <h1 > <?php echo $nome['Nome'] ?> </h1>
+                            <h4 style="margin-left:40%; margin-bottom: 50px;"><?php echo $nome['Nome'] ?> </h4>
                         <form class="was-validated" action="" method="post">
                             <div class="form-row">
                                 <div class="col-5">
-                                <label for="validationcompra">Estoque</label>
-                                <input type="number"  class="form-control" placeholder="Valor da Compra" id="validationcompra" name="valor_compra" required>
+                                <label for="validationcompra">Custo: </label>
+                                <input type="text"  class="form-control" placeholder="Custo do produto" id="validationcompra" name="valor_compra" required>
                                 </div>
                                 <div class="col-5">
-                                <label for="validationestoque">Estoque</label>
-                                <input type="number" class="form-control" placeholder="Estoque" id="validationestoque" name="estoque" required>
+                                <label for="validationestoque">Quantidade m³: </label>
+                                <input type="text" class="form-control" placeholder="Quantidade m³" id="validationestoque" name="estoque" required>
                                 </div>
                                 <div class="col">
-                                    <button type="submit" class="btn btn-success" value="<?php echo $id ?>" name="edd_estoque">
+                                    <button type="submit" class="btn btn-success" style="margin-top: 30px;" value="<?php echo $id ?>" name="edd_estoque">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
                                             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"></path>
@@ -146,10 +146,10 @@ $nome = $sql_query_nome->fetch_assoc();
                             
                                 <div class="form-row">
                                     <div class="col-5">
-                                    <input type="text" class="form-control" value="'. $row['valor_compra'] .'" disabled>
+                                    <input type="text" class="form-control" value="R$'. $row['valor_compra'] .'" disabled>
                                     </div>
                                     <div class="col-5">
-                                    <input type="text" class="form-control" value="'. $row['estoque_metros_quadrados'] .'" disabled>
+                                    <input type="text" class="form-control" value="'. $row['estoque_metros_quadrados'] .' m³" disabled>
                                     </div>
                                     <div class="col">
                                     <form action="" method="post">
@@ -204,25 +204,7 @@ $nome = $sql_query_nome->fetch_assoc();
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php echo $LogoutModal ?>
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
@@ -240,7 +222,23 @@ $nome = $sql_query_nome->fetch_assoc();
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
-
+    <script src="js/jquery.mask.js" type="text/javascript"></script>
+    <script src="js/jquery.maskMoney.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#validationcompra').maskMoney({
+              prefix:'R$ ',
+              allowNegative: true,
+              thousands:'.', decimal:',',
+              affixesStay: true
+            });
+            $('#validationestoque').mask("0000000000,00 m³", { "escapeChar": "m³", reverse: true });
+            
+            
+            // console.log("Aqui");
+            // $("#valorvanda").mask('000.000.000.000.000,00', {reverse: true, "escapeChar": "\\"});
+        });
+    </script>
 </body>
 
 </html>

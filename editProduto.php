@@ -2,31 +2,23 @@
 
 include "php/conexao.php";
 include "php/funcoes.php";
-include "php/menu.php";
+
 
 //Verifica cessão 
-cessao();
+cessao(2);
+include "php/menu.php";
 
  if (isset($_POST['edit_btn'])) {
     // edit produto
-    if(isset($_POST['nome']) || isset($_POST['estoque']) || isset($_POST['valor_compra']) || isset($_POST['valor_venda']) || isset($_POST['categoria']) || isset($_POST['descricao'])) {
+    if(isset($_POST['nome']) || isset($_POST['valor_venda']) || isset($_POST['categoria']) || isset($_POST['descricao'])) {
 
         $nome = clear($_POST['nome']);
-        $estoque = clear($_POST['estoque']);
-        $valor_compra = clear($_POST['valor_compra']);
         $valor_venda = clear($_POST['valor_venda']);
         $categoria = clear($_POST['categoria']);
         $descricao = clear($_POST['descricao']);
         $id = clear($_POST['edit_btn']);
 
-
         $sql_code = "UPDATE `estoque` SET `Nome`='$nome',`valor_venda`='$valor_venda',`categoria_id`='$categoria',`descricao`='$descricao' WHERE ID = $id";
-        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-
-
-        $sql_code = "UPDATE `controle_estoque` SET `valor_compra`='$valor_compra',`estoque_metros_quadrados`='$estoque' WHERE id_estoque = $id ORDER BY ID ASC LIMIT 1";
-        
-        echo $sql_code;
         $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
         $_SESSION['msg'] = '<h2 style="color:green;">Produto atualizado com sucesso!!!</h2>';
@@ -46,7 +38,7 @@ cessao();
     
     $id_produto = $_POST['edit_produto'];
 
-    $sql_code = "SELECT * FROM controle_estoque LEFT JOIN estoque ON controle_estoque.id_estoque = estoque.ID WHERE estoque.ID = $id_produto";
+    $sql_code = "SELECT * FROM controle_estoque RIGHT JOIN estoque ON controle_estoque.id_estoque = estoque.ID WHERE estoque.ID = $id_produto";
     $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
     $usuario = $sql_query->fetch_assoc();
@@ -104,40 +96,30 @@ cessao();
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-                <h1 class="h3 mb-2 text-gray-800">Cadastro de produtos</h1>
-                    <p class="mb-4"> Aqui você pode cadastrar novos produtos.</p>
+                <h1 class="h3 mb-2 text-gray-800">Editar Produto</h1>
+                    <p class="mb-4"> Aqui você pode editar os produtos cadastrados.</p>
                     
                     <!-- Basic Card Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Cadastro de produto</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Editar produto</h6>
                         </div>
                         <div class="card-body">
                             <form class="was-validated " action="" method="POST">
                             <div class="form-row">
                                 <div class="col-md-12 mb-3">
-                                        <label for="validationCustom01">Nome</label>
-                                        <input type="text" class="form-control" id="validationCustom01" placeholder="nome" name="nome" value="<?php echo $usuario['Nome']; ?>" required>
+                                        <label for="validationCustom01">Nome: </label>
+                                        <input type="text" class="form-control" id="validationCustom01" placeholder="Nome do produto" name="nome" value="<?php echo $usuario['Nome']; ?>" required>
                                 </div>
                             </div>
+                            
                             <div class="form-row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="validationCustom02">Estoque</label>
-                                    <input type="number" class="form-control" id="validationCustom02" placeholder="estoque" name="estoque" value="<?php echo $usuario['estoque_metros_quadrados']; ?>" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="validationCustom03">Valor compra</label>
-                                    <input type="number" class="form-control" id="validationCustom03" placeholder="valor compra" name="valor compra" value="<?php echo $usuario['valor_compra']; ?>" required>
-                                </div>
-                                
-                            </div>
-                            <div class="form-row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="validationCustom04">Valor venda</label>
-                                    <input type="number" class="form-control" id="validationCustom04" placeholder="valor venda" name="valor venda" value="<?php echo $usuario['valor_venda']; ?>" required>
+                                    <label for="validationCustom04">Valor da venda: </label>
+                                    <input type="number" min="0.00" max="10000.99" class="form-control" id="validationCustom04" placeholder="valor da venda" name="valor venda" value="<?php echo $usuario['valor_venda']; ?>" required>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="validationCustom02">Categoria</label>
+                                    <label for="validationCustom02">Categoria: </label>
                                     <select class="custom-select" name="categoria" required>
                                     <option value="">---</option>
                                     
@@ -162,10 +144,10 @@ cessao();
                             </div>
                                 
                                 <div class="form-group">
-                                    <label for="exampleFormControlTextarea1">Example textarea</label>
+                                    <label for="exampleFormControlTextarea1">Descrição: </label>
                                     <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="descricao" required> <?php echo $usuario['descricao']; ?></textarea>
                                 </div>
-                                <button class="btn btn-primary" type="submit" name="edit_btn" value="<?php echo $id_produto ?>"> Cadastrar </button>
+                                <button class="btn btn-primary" type="submit" name="edit_btn" value="<?php echo $id_produto ?>"> Salvar edição </button>
                             </form>
                         </div>
                     </div>
@@ -199,25 +181,7 @@ cessao();
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php echo $LogoutModal ?>
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
