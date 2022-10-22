@@ -116,7 +116,7 @@ include "php/menu.php";
                             <div class="form-row">
                                 <div class="col-md-6 mb-3">
                                     <label for="validationCustom04">Valor da venda: </label>
-                                    <input type="number" min="0.00" max="10000.99" class="form-control" id="validationCustom04" placeholder="valor da venda" name="valor venda" value="<?php echo $usuario['valor_venda']; ?>" required>
+                                    <input type="text" class="form-control" id="validationCustom04" placeholder="valor da venda" name="valor venda" value="<?php echo $usuario['valor_venda']; ?>" required>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="validationCustom02">Categoria: </label>
@@ -199,6 +199,20 @@ include "php/menu.php";
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
+
+    <script src="js/jquery.mask.js" type="text/javascript"></script>
+    <script src="js/jquery.maskMoney.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#validationCustom04').maskMoney({
+              prefix:'R$ ',
+              allowNegative: true,
+              thousands:'.', decimal:',',
+              affixesStay: true
+            });
+            
+        });
+    </script>
 
 </body>
 

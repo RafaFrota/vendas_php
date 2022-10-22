@@ -14,14 +14,27 @@ include "php/menu.php";
         
         $cliente = clear($_POST['cliente']);
         $produto = clear($_POST['produto']);
-        $valormetro = clear($_POST['valormetro']);
-        $quantidademetros = clear($_POST['quantidademetros']);
-        $quantidademetros_BD = $quantidademetros;
+        $valormetro = limpar_texto(clear($_POST['valormetro']));
+        $quantidademetros = limpar_texto(clear($_POST['quantidademetros']));
+        $quantidademetros_BD = limpar_texto(clear($quantidademetros));
         $oppagamento = clear($_POST['oppagamento']);
         $statuspagamento = clear($_POST['statuspagamento']);
+        $desconto = clear($_POST['desconto']);
         $id_user = clear($_SESSION['id']);
         $pagamento = 0;
         $pagamento_serv = 0;
+
+        echo $cliente . "</br>";
+        echo $produto . "</br>";
+        echo $valormetro . "</br>";
+        echo $quantidademetros . "</br>";
+        echo $quantidademetros_BD . "</br>";
+        echo $oppagamento . "</br>";
+        echo $statuspagamento . "</br>";
+        echo $id_user . "</br>";
+        echo  $desconto . "</br>";
+        
+
         
         $sql_code = "SELECT SUM(valor_compra), SUM(estoque_metros_quadrados) FROM `controle_estoque` WHERE id_estoque = $produto";
         $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
@@ -113,7 +126,7 @@ include "php/menu.php";
             $msg = "ERRO!! Estoque atual é " . $soma_estoque['SUM(estoque_metros_quadrados)'] ."m², insira um valor valido";
         } 
 }
- // Registrar cliente
+ //Registrar cliente
 
  if(isset($_POST['nomecliente'])) {
     
@@ -153,14 +166,14 @@ include "php/menu.php";
 }
 
 // GET produto
-$sql_code = "SELECT * FROM `estoque`";
+$sql_code = "SELECT * FROM `estoque` WHERE `deletado` = 0";
 $sql_query_produto = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
 // GET cliente
 $sql_code = "SELECT * FROM `cliente`";
 $sql_query_cliente = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
-// GET cliente
+// GET user
 $sql_code = "SELECT * FROM `user`";
 $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
@@ -218,203 +231,219 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-                <h1 class="h3 mb-2 text-gray-800">Registrar venda</h1>
+                    <h1 class="h3 mb-2 text-gray-800">Registrar venda</h1>
                     
                     
                     <!-- Collapsable Card Example -->
                     <div class="card shadow mb-4">
-                                <!-- Card Header - Accordion -->
-                                <a href="#cliente" class="d-block card-header py-3" data-toggle="collapse"
-                                    role="button" aria-expanded="true" aria-controls="cliente">
-                                    <h6 class="m-0 font-weight-bold text-primary"> Cliente </h6>
-                                </a>
-                                <!-- Card Content - Collapse -->
-                                <div class="collapse" id="cliente">
-                                    <div class="card-body">
-                                    <form class="was-validated " action="" method="POST">
-                                        <div class="form-row">
-                                            <div class="col-md-12 mb-3">
-                                                    <label for="validationCustom01">Nome: </label>
-                                                    <input type="text" class="form-control" id="validationCustom01" placeholder="nome" name="nomecliente" required>
-                                            </div>
+                        <!-- Card Header - Accordion -->
+                        <a href="#cliente" class="d-block card-header py-3" data-toggle="collapse"
+                            role="button" aria-expanded="true" aria-controls="cliente">
+                            <h6 class="m-0 font-weight-bold text-primary"> Cliente </h6>
+                        </a>
+                        <!-- Card Content - Collapse -->
+                        <div class="collapse" id="cliente">
+                            <div class="card-body">
+                                <form class="was-validated " action="" method="POST">
+                                    <div class="form-row">
+                                        <div class="col-md-12 mb-3">
+                                            <label for="validationCustom01">Nome: </label>
+                                            <input type="text" class="form-control" id="validationCustom01" placeholder="nome" name="nomecliente" required>
                                         </div>
-                                        <div class="form-row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="validationCustom02">E-mail: </label>
-                                                <input type="email" class="form-control" id="validationCustom02" placeholder="E-mail" name="email" >
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="celular">Celular: </label>
-                                                <input type="number" class="form-control" id="celular" placeholder="(99) 9999-9999" name="celular" >
-                                            </div>
-                                            
-                                        </div>
-                                        <div class="form-row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="cep">CEP: </label>
-                                                <input type="text" class="form-control" id="cep" placeholder="Ex.: 00000-000" name="cep" >
-                                            </div>
-                                            
-                                            <div class="col-md-6 mb-3">
-                                                <label for="endereco">Endereço: </label>
-                                                <input type="number" class="form-control" id="endereco" placeholder="Endereco" name="endereco" >
-                                            </div>
-                                        </div>    
-                                        <button class="btn btn-primary" type="submit"> Cadastrar </button>
-                                    </form>
                                     </div>
-                                </div>
+                                    <div class="form-row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="validationCustom02">E-mail: </label>
+                                            <input type="email" class="form-control" id="validationCustom02" placeholder="E-mail" name="email" >
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="celular">Celular: </label>
+                                            <input type="text" class="form-control" id="celular" placeholder="(99) 9999-9999" name="celular" >
+                                        </div>
+                                            
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="cep">CEP: </label>
+                                            <input type="text" class="form-control" id="cep" placeholder="Ex.: 00000-000" name="cep" >
+                                        </div>
+                                            
+                                        <div class="col-md-6 mb-3">
+                                            <label for="endereco">Endereço: </label>
+                                            <input type="number" class="form-control" id="endereco" placeholder="Endereco" name="endereco" >
+                                        </div>
+                                    </div>    
+                                    <button class="btn btn-primary" type="submit"> Cadastrar </button>
+                                </form>
                             </div>
+                        </div>
+                    </div>
 
                     <!-- Collapsable Card Example -->
                     <div class="card shadow mb-4">
-                                <!-- Card Header - Accordion -->
-                                <a href="#vender" class="d-block card-header py-3" data-toggle="collapse"
-                                    role="button" aria-expanded="true" aria-controls="vender">
-                                    <h6 class="m-0 font-weight-bold text-primary">Venda</h6>
-                                </a>
-                                <!-- Card Content - Collapse -->
-                                <div class="collapse show" id="vender">
-                                    <div class="card-body">
-                                        <h4>
-                                            <?php 
-                                                echo $msg;
-                                                $msg = "";
-                                            ?>
-                                        </h4>
-                                    <form class="was-validated " action="" method="POST">
-                                        <div class="form-row">
-                                            <div class="form-group col-md-6">
-                                                <label for="validationCustom02">Cliente</label>
-                                                <select class="custom-select" name="cliente" required>
-                                                    <option value="">---</option>
+                        <!-- Card Header - Accordion -->
+                        <a href="#vender" class="d-block card-header py-3" data-toggle="collapse"
+                            role="button" aria-expanded="true" aria-controls="vender">
+                            <h6 class="m-0 font-weight-bold text-primary">Venda</h6>
+                        </a>
+                            <!-- Card Content - Collapse -->
+                        <div class="collapse show" id="vender">
+                            <div class="card-body">
+                                <h4>
+                                    <?php 
+                                        echo $msg;
+                                        $msg = "";
+                                    ?>
+                                </h4>
+                                <form class="was-validated " action="" method="POST">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="validationCustom02">Cliente</label>
+                                            <select class="custom-select" name="cliente" required>
+                                                <option value="">---</option>
                                                     
-                                                    <?php 
+                                                <?php 
                                                     
-                                                    while($row = $sql_query_cliente->fetch_assoc()) {
-                                                        echo '<option value="'. $row['ID'] . '">'. $row['nome'] . ' </option>';
-                                                    }
+                                                while($row = $sql_query_cliente->fetch_assoc()) {
+                                                    echo '<option value="'. $row['ID'] . '">'. $row['nome'] . ' </option>';
+                                                }
                                                     
-                                                    ?>
+                                                ?>
                                                 </select>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label for="produto">Produto</label>
-                                                <select class="custom-select" id="produto" name="produto" required>
-                                                    <option value="">---</option>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="produto">Produto</label>
+                                            <select class="custom-select" id="produto" name="produto" required>
+                                                <option value="0">---</option>
                                                     
-                                                    <?php 
+                                                <?php 
                                                     
                                                     while($row = $sql_query_produto->fetch_assoc()) {
                                                         echo '<option value="'. $row['ID'] . '">'. $row['Nome'] . ' </option>';
                                                     }
                                                     
-                                                    ?>
+                                                ?>
                                                     
-                                                </select>
-                                            </div>
+                                            </select>
                                         </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="valor_produto">Valor do m³ </label>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="basic-addon1">R$</span>
+                                                </div>
+                                                <input type="text" class="form-control money" value="" id="valor_produto" placeholder="Valor do produto" name="valormetro" Readonly aria-describedby="basic-addon1">
+                                            </div>
+                                            <!-- <input type="text" class="form-control money" value="" id="valor_produto" placeholder="Valor do produto" name="valormetro" Readonly> -->
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="metros">Quantidade em m³</label>
+                                            <input type="text" class="form-control m3" value="" id="metros" placeholder="Metros" name="quantidademetros" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-check form-switch mt-2 mb-3">
+                                        <input class="form-check-input" type="checkbox" name="check" id='btn-div' value="1">
+                                        <label for="flexSwitchCheckDefault">Gerar ordem de serviço?</label>
+                                    </div>
+                                    <div class="container-servico" style="display: none;">
                                         <div class="form-row">
-                                                <div class="col-md-6 mb-3">
-                                                        <label for="valor_produto">Valor do m² </label>
-                                                        <input type="number" min="0.00" max="10000.00" step="0.01" class="form-control" value="" id="valor_produto" placeholder="Valor do produto" name="valormetro" required>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                        <label for="metros">Quantidade em m²</label>
-                                                        <input type="number" class="form-control" value="" id="metros" placeholder="Metros" name="quantidademetros" required>
-                                                </div>
+                                            <div class="col-md-12 mb-3">
+                                                <label for="valservico" >Valor do serviço R$: </label>
+                                                <input type="text"  class="form-control money" id="valservico" placeholder="Valor recebido" name="valservico" >
                                             </div>
-
-                                            
-                                                
-                                        
-                                        <div class="form-check form-switch mt-2 mb-3">
-                                                <input class="form-check-input" type="checkbox" name="check" id='btn-div' value="1">
-                                                <label for="flexSwitchCheckDefault">Gerar ordem de serviço?</label>
-                                        </div>
-                                                  
-                                        
-                                        <div class="container-servico" style="display: none;">
-                                            
-                                            <div class="form-row">
-                                                <div class="col-md-12 mb-3">
-                                                        <label for="valservico" >Valor do serviço: </label>
-                                                        <input type="number" min="0.00" max="10000.00" step="0.01" class="form-control" id="valservico" placeholder="Valor recebido" name="valservico" >
-                                                </div>
-                                                <div class="col-md-12 mb-3">
-                                                    <label for="Profissional">Profissional responsavel: </label>
-                                                    <select class="custom-select" name="Profissional" id="responsavel">
-                                                        <option value="">---</option>
+                                            <div class="col-md-12 mb-3">
+                                                <label for="Profissional">Profissional responsavel: </label>
+                                                <select class="custom-select" name="Profissional" id="responsavel">
+                                                    <option value="">---</option>
                                                         
-                                                        <?php 
+                                                    <?php 
                                                         
                                                         while($row = $sql_query_user->fetch_assoc()) {
                                                             echo '<option value="'. $row['ID'] . '">'. $row['nome'] . ' </option>';
                                                         }
                                                         
-                                                        ?>
-                                                    </select>
-                                                </div>
+                                                    ?>
+                                                </select>
                                             </div>
-                                            <div class="form-row">
-                                                <div class="col-md-12 mb-3">
-                                                    <label for="desc"> Descrição do Serviço </label>
-                                                    <textarea class="form-control" id="desc" rows="3" name="descricao" ></textarea>
-                                                </div>
-                                            </div>
-
-                                                 
                                         </div>
-
                                         <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="validationCustom02">Forma de pagamento: </label>
-                                                        <select class="custom-select" name="oppagamento" required>
-                                                            <option value="">---</option>
-                                                            <option value="1">A vista</option>
-                                                            <option value="2">Cartão de credito</option>
-                                                            <option value="3">Cartão de debito</option>
-                                                            <option value="3">PIX</option>
-                                                        </select>
-                                                </div>
-                                                
-                                                <div class="form-group col-md-6 ">
-                                                    <label for="pagamento">Pagamentos</label>
-                                                        <select class="custom-select" name="statuspagamento" id="pagamento" required>
-                                                            <option value="">---</option>
-                                                            <option value="1">Pagamento efetuado</option>
-                                                            <option value="2">Pagamento parcial</option>
-                                                            <option value="3">Pagamento pendente</option>
-                                                        </select>
-                                                </div>
-                                        </div>
-                                            <div class="form-row container-pagamento" style="display: none;">
-                                                <div class="col-md-12 mb-3">
-                                                        <label for="valor-recebido">Valor recebido: </label>
-                                                        <input type="number" min="0.00" max="10000.00" step="0.01" class="form-control" id="valor-recebido" placeholder="Valor recebido" name="pagamento" >
-                                                </div>
-                                            </div>                
-                                        
-                                        
-                                        
-                                        <div id="total_areceber"></div>
-                                        <div id="total_servico" ></div>
-                                        <div id="total_recebido" ></div>
-                                        <div id="total"></div>
-                                        
-                                        <button class="btn btn-primary" type="submit"> Cadastrar </button>
-                                    </form>
+                                            <div class="col-md-12 mb-3">
+                                                <label for="desc"> Descrição do Serviço </label>
+                                                <textarea class="form-control" id="desc" rows="3" name="descricao" ></textarea>
+                                            </div>
+                                        </div>    
                                     </div>
-                                </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="validationCustom02">Forma de pagamento: </label>
+                                            <select class="custom-select" name="oppagamento" required>
+                                                <option value="">---</option>
+                                                <option value="1">A vista</option>
+                                                <option value="2">Cartão de credito</option>
+                                                <option value="3">Cartão de debito</option>
+                                                <option value="3">PIX</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-6 ">
+                                            <label for="pagamento">Pagamentos</label>
+                                            <select class="custom-select" name="statuspagamento" id="pagamento" required>
+                                                <option value="">---</option>
+                                                <option value="1">Pagamento efetuado</option>
+                                                <option value="2">Pagamento parcial</option>
+                                                <option value="3">Pagamento pendente</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-row container-pagamento" style="display: none;">
+                                        <div class="col-md-12 mb-3">
+                                            <label for="valor-recebido">Valor recebido R$:</label>
+                                            <input type="text"  class="form-control money"  id="valor-recebido" placeholder="Valor recebido" name="pagamento" >
+                                        </div>
+                                    </div> 
+                                    <div class="form-row container-pagamento" >
+                                        <div class="col-md-12 mb-3">
+                                            <label for="valor-recebido">Desconto R$:</label>
+                                            <input type="text" class="form-control money"  id="desconto" placeholder="Desconto" name="desconto" >
+                                        </div>
+                                    </div>               
+                                    <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#venderModal"> Cadastrar </button>
+                                    <!-- Logout Modal-->
+                                    <div class="modal fade" id="venderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                            aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Confira os valores antes de fechar a venda</h5>
+                                                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body"><div id="total_areceber"></div>
+                                                    <div id="total_servico" ></div>
+                                                    <div id="total_desconto" ></div>
+                                                    <div id="total_recebido" ></div>
+                                                    <div id="total"></div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                                                    <form action="" method="POST">
+                                                        <button type="submit" class="btn btn-primary">
+                                                            Fechar venda
+                                                        </button>
+                                                </div>       
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-
-                         
-
-
+                        </div>
+                    </div>
                 </div>
                 <!-- /.container-fluid -->
-
             </div>
+            
             <!-- End of Main Content -->
 
             <!-- Footer -->
@@ -426,7 +455,6 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                 </div>
             </footer>
             <!-- End of Footer -->
-
         </div>
         <!-- End of Content Wrapper -->
 
@@ -457,8 +485,16 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
      
-    
-    <script>
+    <script src="js/jquery.mask.js" type="text/javascript"></script>
+    <script src="js/jquery.maskMoney.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        
+        $(document).ready(function() {
+            $('.money').mask("0000000000,00" , { reverse: true });
+            $('#celular').mask("(00)00000-0000");
+            $('#cep').mask("00.000-000");
+            $('.m3').mask("0000000000,00 m³", { "escapeChar": "m³", reverse: true });
+        });
 //----------------------------------------------------
 var btn = document.getElementById('btn-div');
 var container = document.querySelector('.container-servico');
@@ -467,7 +503,7 @@ var responsavel = document.querySelector('#responsavel');
 var desc = document.querySelector('#desc');
 
 serv = false;
-val_par = false;
+val_par = 0;
 
 btn.addEventListener('change', function() {
     
@@ -493,6 +529,17 @@ btn.addEventListener('change', function() {
 
 //----------------------------------------------------
 var inp_valor = document.getElementById('valor-recebido');
+console.log(inp_valor);
+
+inp_valor.addEventListener('change', function() {
+    
+    calcula();
+    
+  });
+
+//----------------------------------------------------
+var inp_valor = document.getElementById('desconto');
+console.log(inp_valor);
 
 inp_valor.addEventListener('change', function() {
     
@@ -521,12 +568,17 @@ btn_pagamento.addEventListener('change', function() {
     if (btn_pagamento.value == 2) {
         container_pagamento.style.display = 'block';
         valor_recebido.setAttribute('required', '');
-        val_par = false;
+        val_par = 2;
         calcula();
-    }else{
+    }else if (btn_pagamento.value == 1){
         container_pagamento.style.display = 'none';
         valor_recebido.removeAttribute('required');
-        val_par = true;
+        val_par = 1;
+        calcula();
+    }else if (btn_pagamento.value == 3){
+        container_pagamento.style.display = 'none';
+        valor_recebido.removeAttribute('required');
+        val_par = 3;
         calcula();
     }
     
@@ -573,8 +625,10 @@ btn_pagamento.addEventListener('change', function() {
                 
             var produto = parseFloat(document.querySelector("#valor_produto").value);
             var metros = parseFloat(document.querySelector("#metros").value);
-            var valor_pago = parseFloat(document.querySelector("#valor-recebido").value);
+            var valor_pago =0;
             var valservico = parseFloat(document.querySelector("#valservico").value);
+            var desconto = parseFloat(document.querySelector("#desconto").value);
+            
             
             if (isNaN(produto)) {
                 produto = 0;
@@ -591,24 +645,36 @@ btn_pagamento.addEventListener('change', function() {
             if (isNaN(valservico)) {
                 valservico = 0;
             }
+
+            if (isNaN(desconto)) {
+                desconto = 0;
+            }
             
             if (serv) {
                 valservico = 0;
             }
             
-            if (val_par) {
+            if (val_par == 1) {
+                valor_pago = (produto * metros) + valservico - desconto;
+            }else if (val_par == 2){
+                valor_pago = parseFloat(document.querySelector("#valor-recebido").value);
+            }else if (val_par == 3){
                 valor_pago = 0;
             }
             
-            var result = (produto * metros) + valservico - valor_pago;
+            var result = (produto * metros) + valservico - desconto - valor_pago;
             var total_produt = produto * metros;
             
             document.querySelector('#total_areceber').innerHTML = '<h5> Total produto: R$'+ total_produt +' </h5>';
             document.querySelector('#total_servico').innerHTML = '<h5> Total serviço: R$'+ valservico +' </h5>';
-            document.querySelector('#total_recebido').innerHTML = '<h5 style="color: rgba(15, 191, 2, 0.8);"> Valor pago: R$ '+ valor_pago +' </h5>';
-            document.querySelector('#total').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> Total: R$'+ result +' </h5>';
+            document.querySelector('#total_recebido').innerHTML = '<h5 style="color: rgba(15, 191, 2, 0.8);"> Valor da entrada: R$ '+ valor_pago +' </h5>';
+            document.querySelector('#total_desconto').innerHTML = '<h5 style="color: rgba(15, 191, 2, 0.8);"> Valor desconto: R$ '+ desconto +' </h5>';
+            document.querySelector('#total').innerHTML = '<h5 style="color: rgba(255, 0, 0, 0.69);"> Saldo restante: R$'+ result +' </h5>';
 
         }
+        
+        
+
 </script>
 
 </body>

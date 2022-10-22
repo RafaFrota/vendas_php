@@ -29,4 +29,17 @@ function cessao($nivel_cesso){
 
 }
 
+function limpar_texto($str){ 
+    return preg_replace("/[^0-9]/", "", $str); 
+  }
+
+
+ 
+  function farmat_num($num){ 
+    return number_format($num, 2, '.', ''); 
+  }
+  
+
+
+
 ?>
