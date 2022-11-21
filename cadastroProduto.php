@@ -17,9 +17,9 @@ include "php/menu.php";
  if(isset($_POST['nome']) || isset($_POST['estoque']) || isset($_POST['valor_compra']) || isset($_POST['valor_venda']) || isset($_POST['categoria']) || isset($_POST['descricao'])) {
 
         $nome = clear($_POST['nome']);
-        $estoque = clear($_POST['estoque']);
-        $valor_compra = clear($_POST['valor_compra']);
-        $valor_venda = clear($_POST['valor_venda']);
+        $estoque = limpar_texto(clear($_POST['estoque']));
+        $valor_compra = farmat_num(limpar_texto(clear($_POST['valor_compra'])));
+        $valor_venda = farmat_num(limpar_texto(clear($_POST['valor_venda'])));
         $categoria = clear($_POST['categoria']);
         $descricao = clear($_POST['descricao']);
         $id_user = clear($_SESSION['id']);
@@ -114,15 +114,25 @@ include "php/menu.php";
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="validationCustom03">Valor da compra:</label>
-                                    <input type="text" class="form-control" id="validationCustom03" placeholder="valor compra" name="valor compra" required>
-                                </div>
-                                
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">R$</span>
+                                            </div>
+                                            <input type="text" class="form-control money" id="validationCustom03" placeholder="valor compra" name="valor compra" required>
+                                        </div>  
+                                    </div>
                             </div>
                             <div class="form-row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="valorvanda">Valor da venda:</label>
-                                    <input type="text" class="form-control" id="valorvanda" placeholder="valor venda" name="valor venda" required>
-                                </div>
+                            <div class="col-md-6 mb-3">
+                            <label for="valorvanda">Valor da venda:</label>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">R$</span>
+                                            </div>
+                                            <input type="text" class="form-control money" id="valorvanda" placeholder="valor venda" name="valor venda" required>
+                                        </div>  
+                                    </div>
+                                
                                 <div class="form-group col-md-6">
                                     <label for="validationCustom02">Categoria:</label>
                                     <select class="custom-select" name="categoria" required>
@@ -200,23 +210,9 @@ include "php/menu.php";
     <script src="js/jquery.maskMoney.js" type="text/javascript"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#valorvanda').maskMoney({
-              prefix:'R$ ',
-              allowNegative: true,
-              thousands:'.', decimal:',',
-              affixesStay: true
-            });
-            $('#validationCustom03').maskMoney({
-              prefix:'R$ ',
-              allowNegative: true,
-              thousands:'.', decimal:',',
-              affixesStay: true
-            });
+           
             $('#validationCustom02').mask("0000000000,00 m³", { "escapeChar": "m³", reverse: true });
-            
-            
-            // console.log("Aqui");
-            // $("#valorvanda").mask('000.000.000.000.000,00', {reverse: true, "escapeChar": "\\"});
+            $('.money').mask("0000000000,00" , { reverse: true });
         });
     </script>
 

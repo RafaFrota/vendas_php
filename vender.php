@@ -7,6 +7,7 @@ include "php/funcoes.php";
 //Verifica cessão 
 cessao(1);
 include "php/menu.php";
+include "php//vendaFuncoes.php";
  
  // Registrar produto
  $msg = "";
@@ -16,115 +17,77 @@ include "php/menu.php";
         $produto = clear($_POST['produto']);
         $valormetro = limpar_texto(clear($_POST['valormetro']));
         $quantidademetros = limpar_texto(clear($_POST['quantidademetros']));
-        $quantidademetros_BD = limpar_texto(clear($quantidademetros));
+        $quantidademetros_BD = $quantidademetros;
         $oppagamento = clear($_POST['oppagamento']);
         $statuspagamento = clear($_POST['statuspagamento']);
-        $desconto = clear($_POST['desconto']);
+        $input_pagamento = limpar_texto(clear($_POST['pagamento']));
+        //echo $input_pagamento . "  input_pagamento </br>";
         $id_user = clear($_SESSION['id']);
-        $pagamento = 0;
-        $pagamento_serv = 0;
-
-        echo $cliente . "</br>";
-        echo $produto . "</br>";
-        echo $valormetro . "</br>";
-        echo $quantidademetros . "</br>";
-        echo $quantidademetros_BD . "</br>";
-        echo $oppagamento . "</br>";
-        echo $statuspagamento . "</br>";
-        echo $id_user . "</br>";
-        echo  $desconto . "</br>";
-        
-
-        
-        $sql_code = "SELECT SUM(valor_compra), SUM(estoque_metros_quadrados) FROM `controle_estoque` WHERE id_estoque = $produto";
-        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-        //echo $sql_code;
-        $soma_estoque = $sql_query->fetch_assoc();
-
-        if($quantidademetros <= $soma_estoque['SUM(estoque_metros_quadrados)'] && $quantidademetros > 0 ){
-            
-            if (isset($_POST['pagamento']) && $_POST['pagamento'] != '' && $statuspagamento == 2) {
-            
-                $valor_total = $valormetro * $quantidademetros;
-                if ($_POST['pagamento'] <= $valor_total) {
-                    $pagamento = clear($_POST['pagamento']);
-                }else{
-                    
-                    $pagamento = $valormetro * $quantidademetros;
-                    $pagamento_serv = clear($_POST['pagamento']) - $pagamento;
-                }
-    
-            }else if ($statuspagamento == 1 && $quantidademetros != 0){
-                $pagamento = $valormetro * $quantidademetros;
-            }else if ($quantidademetros == 0){
-                $pagamento = $quantidademetros;
-            }
-    
-            $calc = $pagamento + $pagamento_serv;
-    
-            if ($calc <= $_POST['pagamento'] && $_POST['pagamento'] > 0 or $statuspagamento == 1 or $statuspagamento == 2 or $statuspagamento == 3) {
-                $controle = TRUE;
-                //$estoque = 30;
-                do{
-                    $sql_code = "SELECT `estoque_metros_quadrados` FROM `controle_estoque` WHERE `id_estoque` = $produto LIMIT 1";
-                    //echo $sql_code . " </br>";
-                    $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-                    $estoque = $sql_query->fetch_assoc();
-                    $result = $estoque['estoque_metros_quadrados'] - $quantidademetros;
-                    if ($result < 0){
-
-                        $sql_code = "DELETE FROM `controle_estoque` LIMIT 1";
-                        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-                        $quantidademetros =- $result; 
-                        
-                    }else if ($result == 0){
-                        $sql_code = "DELETE FROM `controle_estoque` LIMIT 1";
-                        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-                        $controle = FALSE;
-                        $quantidademetros =- $result; 
-                        
-                    }else if($result > 0){
-
-                        $sql_code = "UPDATE `controle_estoque` SET `estoque_metros_quadrados`= $result LIMIT 1";
-                        
-                        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-                        $quantidademetros =- $result; 
-                        $controle = FALSE;
-                    }else {
-                        $controle = FALSE;
-                    }
-
-                }while($controle);
-
-                if ($quantidademetros <= 0) {
-                    $sql_code = "INSERT INTO `venda`(`cliente`, `produto`, `valormetro`, `quantidadeMetros`, `formaDePagamento`, `statusPagamento`, `pagamento`, `user_ID`) VALUES ($cliente,$produto,$valormetro,$quantidademetros_BD,$oppagamento,$statuspagamento,$pagamento,$id_user)";
-                    $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-                        
-                    $idsql = $mysqli->insert_id;
-                                        
-                    if(isset($_POST['Profissional']) && isset($_POST['descricao']) && isset($_POST['valservico']) && isset($_POST['check']) && $idsql != 0) {
-                            
-                        if ($statuspagamento == 1){
-                            $pagamento_serv = clear($_POST['valservico']);
-                        }
-                            
-                        $valservico = clear($_POST['valservico']);
-                        $Profissional = clear($_POST['Profissional']);
-                        $descricao = clear($_POST['descricao']);
-                        $sql_code = "INSERT INTO `servicovenda`(`profissional`, `descricao`, `valServico`, `valorPago`, `venda_ID`) VALUES ($Profissional, '$descricao',$valservico, $pagamento_serv, $idsql)";
-                        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-                            
-                        }
-                        
-                    }else {
-                        $msg = "Algo errado com o pagamento";
-                        echo $result;
-                    }
-                }
-                
+        if( !empty ( $_POST['desconto'] ) ) {
+            $desconto = limpar_texto(clear($_POST['desconto']));
         }else {
-            $msg = "ERRO!! Estoque atual é " . $soma_estoque['SUM(estoque_metros_quadrados)'] ."m², insira um valor valido";
-        } 
+            $desconto = 0.00;
+        }
+        $chack = 0;
+        if(!empty($_POST['check'])) {
+            //echo "marcou";
+            $chack = 1;
+        }
+        $valservico = 0;
+        if(isset($_POST['Profissional']) && isset($_POST['descricao']) && isset($_POST['valservico']) && $chack == 1) {
+            
+            
+            $valservico = limpar_texto(clear($_POST['valservico']));
+            $Profissional = clear($_POST['Profissional']);
+            $descricao = clear($_POST['descricao']);
+                           
+        }
+        
+        $result = somar_estoque($produto,$quantidademetros);
+        if($result == 1){
+            
+            // valida pagamento (Retorna o valor que deve casdastrar na tabela venda)
+            $pagamento = validar_op_pagamento($statuspagamento, $valormetro, $quantidademetros, $desconto,$input_pagamento, $chack, $valservico);
+            //echo $pagamento;
+            
+            if ($pagamento >= 0) {
+                $result = estoque($produto,$quantidademetros);
+                if ($result == 1) {
+                    
+                    $idproduto = Cadastro_venda($cliente,$produto,$valormetro,$quantidademetros_BD,$oppagamento,$statuspagamento,$desconto, $pagamento, $id_user,$valservico, $chack);
+                    if ($idproduto > 0) {
+                        if ($chack) {
+                            //echo $idproduto . "Cadastro servicovenda </br>";
+                            $result_sql = Cadastro_servico($valservico,$Profissional,$descricao,$valormetro,$quantidademetros,$desconto,$input_pagamento,$idproduto);
+                            if ($result_sql) {
+                                //header("Location: Vendasrealizadas.php");
+                                $_SESSION['msg'] = "Venda cadastrada";
+                            }else {
+                                $_SESSION['msg'] = "erro ao cadastrar Serviço";
+                            }
+                        
+                        }else{
+                            //header("Location: Vendasrealizadas.php");
+                            $_SESSION['msg'] = "Venda cadastrada";
+                        }
+                    }else {
+                        $_SESSION['msg'] = "erro ao cadastrar venda";
+                    }
+                    
+                }else {
+                    $_SESSION['msg'] = "erro ao debitar do estoque";
+                }
+            }else{
+                $_SESSION['msg'] = "Algo errado com o pagamento";
+            //echo $msg;
+            }
+        }else{
+            $_SESSION['msg'] = $result;
+            //echo $msg;
+        }
+
+        
+            
 }
  //Registrar cliente
 
@@ -140,7 +103,7 @@ include "php/menu.php";
     if (empty($_POST['celular'])) {
         $celular = 0;
     }else{
-        $celular = clear($_POST['celular']);
+        $celular = limpar_texto(clear($_POST['celular']));
     }
 
     if (empty($_POST['celular'])) {
@@ -160,7 +123,7 @@ include "php/menu.php";
 
 
     $sql_code = "INSERT INTO `cliente`( `nome`, `email`, `celular`, `cep`, `endereco`, `criado_por`) VALUES ('$nome','$email',$celular,$cep,'$endereco',$id_user)";
-    echo $sql_code;
+    //echo $sql_code;
     $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
 }
@@ -270,7 +233,7 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                             
                                         <div class="col-md-6 mb-3">
                                             <label for="endereco">Endereço: </label>
-                                            <input type="number" class="form-control" id="endereco" placeholder="Endereco" name="endereco" >
+                                            <input type="text" class="form-control" id="endereco" placeholder="Endereco" name="endereco" >
                                         </div>
                                     </div>    
                                     <button class="btn btn-primary" type="submit"> Cadastrar </button>
@@ -289,11 +252,15 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                             <!-- Card Content - Collapse -->
                         <div class="collapse show" id="vender">
                             <div class="card-body">
-                                <h4>
-                                    <?php 
-                                        echo $msg;
-                                        $msg = "";
-                                    ?>
+                                <h4 style="color: rgba(245, 39, 39, 0.8);">
+                                <?php 
+                    
+                                if (isset($_SESSION['msg'])) {
+                                    echo $_SESSION['msg']; 
+                                    unset($_SESSION['msg']);
+                                }
+                                
+                                ?>
                                 </h4>
                                 <form class="was-validated " action="" method="POST">
                                     <div class="form-row">
@@ -344,7 +311,7 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                         </div>
                                     </div>
                                     <div class="form-check form-switch mt-2 mb-3">
-                                        <input class="form-check-input" type="checkbox" name="check" id='btn-div' value="1">
+                                        <input class="form-check-input" type="checkbox" name="check" id='btn-div'>
                                         <label for="flexSwitchCheckDefault">Gerar ordem de serviço?</label>
                                     </div>
                                     <div class="container-servico" style="display: none;">
@@ -526,6 +493,15 @@ btn.addEventListener('change', function() {
   }
 });
 
+//----------------------------------------------------
+var produto = document.getElementById('produto');
+
+
+produto.addEventListener('click', function() {
+    
+    calcula();
+    
+  });
 
 //----------------------------------------------------
 var inp_valor = document.getElementById('valor-recebido');
@@ -623,11 +599,11 @@ btn_pagamento.addEventListener('change', function() {
         function calcula(op){
                 
                 
-            var produto = parseFloat(document.querySelector("#valor_produto").value);
-            var metros = parseFloat(document.querySelector("#metros").value);
+            var produto = parseFloat(document.querySelector("#valor_produto").value.replace(",","."));
+            var metros = parseFloat(document.querySelector("#metros").value.replace(",","."));
             var valor_pago =0;
-            var valservico = parseFloat(document.querySelector("#valservico").value);
-            var desconto = parseFloat(document.querySelector("#desconto").value);
+            var valservico = parseFloat(document.querySelector("#valservico").value.replace(",","."));
+            var desconto = parseFloat(document.querySelector("#desconto").value.replace(",","."));
             
             
             if (isNaN(produto)) {
@@ -657,7 +633,7 @@ btn_pagamento.addEventListener('change', function() {
             if (val_par == 1) {
                 valor_pago = (produto * metros) + valservico - desconto;
             }else if (val_par == 2){
-                valor_pago = parseFloat(document.querySelector("#valor-recebido").value);
+                valor_pago = parseFloat(document.querySelector("#valor-recebido").value.replace(",","."));
             }else if (val_par == 3){
                 valor_pago = 0;
             }

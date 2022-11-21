@@ -11,26 +11,49 @@ $msg = "";
  // Registrar produto
     if(isset($_POST['Profissional']) && isset($_POST['descricao']) && isset($_POST['valservico']) && isset($_POST['valservico']) && isset($_POST['valservico'])) {          
         
-        if ($_POST['pagamento'] < $_POST['valservico']) {
-            $pagamento_serv = clear($_POST['valservico']);       
-            $valservico = clear($_POST['valservico']);
+               
+            $pagamento_serv = limpar_texto(clear($_POST['valservico']));       
+            $valservico = limpar_texto(clear($_POST['valservico']));
             $Profissional = clear($_POST['Profissional']);
             $descricao = clear($_POST['descricao']);
             $formaPagamento = clear($_POST['oppagamento']);
-            $valorPago = clear($_POST['pagamento']);
+            $valorPago = limpar_texto(clear($_POST['pagamento']));
+            $statusPagamento = clear($_POST['statuspagamento']);
+            if(!empty($_POST['desconto'])){
+                // var_dump($_POST['desconto']);
+                $desconto = limpar_texto(clear($_POST['desconto']));
+            }else{
+                $desconto = 0.00;
+            }
+            
             $user_id = clear($_SESSION['id']);
 
             if ($_POST['statuspagamento'] == 1) {
+                
                 $valorPago = $valservico;
             }else if ($_POST['statuspagamento'] == 3){
+                
                 $valorPago = 0;
             }
+            if ($valorPago+$desconto <= $valservico) {
+            
+                // echo $pagamento_serv . "</br>";
+                
+                // echo $valservico . "</br>";
+                // echo $Profissional . "</br>";
+                // echo $descricao . "</br>";
+                // echo $formaPagamento . "</br>";
+                // echo $valorPago . "</br>";
+                // echo $desconto  . "</br>";
+                // echo $user_id . "</br>";
+            
 
-            $sql_code = "INSERT INTO `servico`(`valor`, `profissional`, `descricao` , `formdaPagamento`, `valorPago` , `status`,  `user_id`) VALUES ('$pagamento_serv','$Profissional','$descricao', $formaPagamento,$valorPago,1,'$user_id')";
-            $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-        }else{
-            $msg = "Valor recebido maior que o valor do serviço";
-        }
+                $sql_code = "INSERT INTO `servico`(`valor`, `profissional`, `descricao`, `formdaPagamento`, `desconto`, `valorPago`, `status`, `statusPagamento`, `user_id`) VALUES ($valservico, $Profissional, '$descricao', $formaPagamento, $desconto, $valorPago, 1, $statusPagamento, $user_id)";
+                // echo $sql_code;    
+                $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+            }else{
+                $msg = "Valor recebido maior que o valor do serviço";
+            }
         
                     
     }
@@ -112,13 +135,16 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                 <div class="collapse show" id="vender">
                                     <div class="card-body">
                                     <form class="was-validated " action="" method="POST">
-                                    
-                                        <div class="container-servico">
-                                            
-                                            <div class="form-row">
+                                        <div class="container-servico">  
+                                            <div class="form-row " >
                                                 <div class="col-md-12 mb-3">
-                                                        <label for="valservico" >Valor do serviço: </label>
-                                                        <input type="number" min="0.00" max="10000.00" step="0.01" class="form-control" id="valservico" placeholder="Valor recebido" name="valservico">
+                                                <label for="valservico" >Valor do serviço: </label>
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text" id="basic-addon1">R$</span>
+                                                        </div>
+                                                    <input type="text" class="form-control money" id="valservico" placeholder="Valor recebido" name="valservico">
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-12 mb-3">
                                                     <label for="Profissional">Profissional responsavel: </label>
@@ -163,15 +189,32 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
                                                         </select>
                                                 </div>
                                         </div>
-                                            <div class="form-row container-pagamento" style="display: none;">
-                                                <div class="col-md-12 mb-3">
-                                                        <label for="valor-recebido">Valor recebido: </label>
-                                                        <input type="number" min="0.00" max="10000.00" step="0.01" class="form-control" id="valor-recebido" placeholder="Valor recebido" name="pagamento" >
-                                                        
+                                        <div class="form-row container-pagamento" style="display: none;">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="valor-recebido">Valor recebido: </label>
+                                                <div class="input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="basic-addon1">R$</span>
+                                                    </div>
+                                                    <input type="text"  class="form-control money require" id="valor-recebido " placeholder="Valor recebido" name="pagamento" >
                                                 </div>
-                                            </div>    
+                                            </div>
+                                        </div> 
+                                        
+                                        <div class="form-row " >
+                                            <div class="col-md-12 mb-3">
+                                                <label for="valor-desconto">Desconto: </label>
+                                                <div class="input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="basic-addon1">R$</span>
+                                                    </div>
+                                                    <input type="text" class="form-control money" id="valor-desconto" placeholder="Valor desconto" name="desconto" >
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button class="btn btn-primary" type="submit"> Cadastrar </button>
+
+                                    </div>
+                                    <button class="btn btn-primary" type="submit"> Cadastrar </button>
                                     </form>
                                     </div>
                                 </div>
@@ -226,14 +269,21 @@ $sql_query_user = $mysqli->query($sql_code) or die("Falha na execução do códi
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
 
+    <script src="js/jquery.mask.js" type="text/javascript"></script>
+    <script src="js/jquery.maskMoney.js" type="text/javascript"></script>
+    
     <script>
+        $(document).ready(function() {
+            $('.money').mask("0000000000,00" , { reverse: true });
+            
+        });
         var btn_pagamento = document.getElementById('pagamento');
         var container_pagamento = document.querySelector('.container-pagamento');
-        var valor_recebido = document.querySelector('#valor-recebido');
+        var valor_recebido = document.querySelector('.require');
 
         btn_pagamento.addEventListener('change', function() {
             
-            console.log(btn_pagamento.value);
+            //console.log(btn_pagamento.value);
             if (btn_pagamento.value == 2) {
                 container_pagamento.style.display = 'block';
                 valor_recebido.setAttribute('required', '');

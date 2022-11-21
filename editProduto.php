@@ -13,7 +13,7 @@ include "php/menu.php";
     if(isset($_POST['nome']) || isset($_POST['valor_venda']) || isset($_POST['categoria']) || isset($_POST['descricao'])) {
 
         $nome = clear($_POST['nome']);
-        $valor_venda = clear($_POST['valor_venda']);
+        $valor_venda = farmat_num(limpar_texto(clear($_POST['valor_venda'])));
         $categoria = clear($_POST['categoria']);
         $descricao = clear($_POST['descricao']);
         $id = clear($_POST['edit_btn']);
@@ -116,8 +116,14 @@ include "php/menu.php";
                             <div class="form-row">
                                 <div class="col-md-6 mb-3">
                                     <label for="validationCustom04">Valor da venda: </label>
-                                    <input type="text" class="form-control" id="validationCustom04" placeholder="valor da venda" name="valor venda" value="<?php echo $usuario['valor_venda']; ?>" required>
-                                </div>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">R$</span>
+                                            </div>
+                                            <input type="text" class="form-control money" id="validationCustom04" placeholder="valor da venda" name="valor venda" value="<?php echo farmat_virgula($usuario['valor_venda']); ?>" required>
+                                        </div>  
+                                    </div>
+                                
                                 <div class="form-group col-md-6">
                                     <label for="validationCustom02">Categoria: </label>
                                     <select class="custom-select" name="categoria" required>
@@ -204,12 +210,7 @@ include "php/menu.php";
     <script src="js/jquery.maskMoney.js" type="text/javascript"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#validationCustom04').maskMoney({
-              prefix:'R$ ',
-              allowNegative: true,
-              thousands:'.', decimal:',',
-              affixesStay: true
-            });
+            $('.money').mask("0000000000,00" , { reverse: true });
             
         });
     </script>

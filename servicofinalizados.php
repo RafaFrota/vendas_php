@@ -11,11 +11,11 @@ include "php/menu.php";
 
 
 // GET categoria
-$sql_code = "SELECT * FROM `servicovenda` INNER JOIN statusservico ON servicovenda.status = statusservico.ID WHERE status = 3 or status = 4";
+$sql_code = 'SELECT *,DATE_FORMAT(servicovenda.data,"Data: %d/%m/%Y Hora: %h:%m") FROM `servicovenda` INNER JOIN statusservico ON servicovenda.status = statusservico.ID WHERE status = 3 or status = 4';
 //echo $sql_code . "</br>";
 $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
-$sql_code_s = "SELECT * FROM `servico` INNER JOIN statusservico ON servico.status = statusservico.ID WHERE status = 3 or status = 4";
+$sql_code_s = 'SELECT *,DATE_FORMAT(servico.data,"Data: %d/%m/%Y Hora: %h:%m") FROM `servico` INNER JOIN statusservico ON servico.status = statusservico.ID WHERE status = 3 or status = 4';
 //echo $sql_code_s;
 $sql_query_s = $mysqli->query($sql_code_s) or die("Falha na execução do código SQL: " . $mysqli->error);
 
@@ -102,8 +102,15 @@ $sql_query_s = $mysqli->query($sql_code_s) or die("Falha na execução do códig
                                                     
                                                     echo '<div class="card ">
                                                     <div class="card-body">
-                                                                    <h5 class="card-title"> Descrição: '. $row['descricao'] .'</h5>
-                                                                    <p class="card-text"> Status: '. $row['nome'] .'</p>
+                                                                    <h5 class="card-title"> Descrição: '. $row['descricao'] .'</h5>';
+                                                                    if($row['status'] == 3){
+                                                                        echo '<p class="card-text" style="color: rgba(0, 0, 0, 0.7);"> Status: '. $row['nome'] .'</p>';
+                                                                    }else{
+                                                                        echo '<p class="card-text" style="color: rgba(245, 40, 145, 0.8);"> Status: '. $row['nome'] .'</p>';
+                                                                    }
+                                                                    
+                                                                    echo '
+                                                                    <p class="card-text"> Status: '. $row['DATE_FORMAT(servicovenda.data,"Data: %d/%m/%Y Hora: %h:%m")'] .'</p>
                                                                     
                                                                     <p class="card-text"> Valor pago: R$ '. $row['valServico'] .'</p>
                                                                         
@@ -135,9 +142,15 @@ $sql_query_s = $mysqli->query($sql_code_s) or die("Falha na execução do códig
                                                     
                                                     echo '<div class="card ">
                                                     <div class="card-body">
-                                                                    <h5 class="card-title"> Descrição: '. $row['descricao'] .'</h5>
-                                                                    <p class="card-text"> Status: '. $row['nome'] .'</p>
+                                                                    <h5 class="card-title"> Descrição: '. $row['descricao'] .'</h5>';
                                                                     
+                                                                    if($row['status'] == 3){
+                                                                        echo '<p class="card-text" style="color: rgba(0, 0, 0, 0.7);"> Status: '. $row['nome'] .'</p>';
+                                                                    }else{
+                                                                        echo '<p class="card-text" style="color: rgba(245, 40, 145, 0.8);"> Status: '. $row['nome'] .'</p>';
+                                                                    }
+                                                                    
+                                                                    echo '<p class="card-text" >  '. $row['DATE_FORMAT(servico.data,"Data: %d/%m/%Y Hora: %h:%m")'] .'</p>
                                                                     <p class="card-text"> Valor pago: R$ '. $row['valor'] .'</p>
                                                                         
                                                         </div>

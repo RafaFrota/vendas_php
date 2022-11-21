@@ -18,8 +18,8 @@ include "php/menu.php";
 } elseif (isset($_POST['edd_estoque'])) {
     $id = $_POST['edd_estoque'];
     if(isset($_POST['estoque']) || isset($_POST['valor_compra'])) {
-        $estoque = clear($_POST['estoque']);
-        $valor_compra = clear($_POST['valor_compra']);
+        $estoque = limpar_texto(clear($_POST['estoque']));
+        $valor_compra = limpar_texto(clear($_POST['valor_compra']));
         $id_user = clear($_SESSION['id']);
 
         $sql_code = "INSERT INTO `controle_estoque`(`id_estoque`, `valor_compra`, `estoque_metros_quadrados`, `ID_user`) VALUES ($id,$valor_compra,$estoque,$id_user)";

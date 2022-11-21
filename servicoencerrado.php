@@ -13,11 +13,11 @@ include "php/menu.php";
 // GET categoria
 $prof_ID = $_SESSION['id'];
 
-$sql_code = "SELECT * FROM `servicovenda` INNER JOIN statusservico ON servicovenda.status = statusservico.ID WHERE status = 3 OR status = 4 AND profissional = $prof_ID";
+$sql_code = 'SELECT *,DATE_FORMAT(servicovenda.data,"Data: %d/%m/%Y Hora: %h:%m") FROM `servicovenda` INNER JOIN statusservico ON servicovenda.status = statusservico.ID WHERE status = 3 OR status = 4 AND profissional ='. $prof_ID;
 //echo $sql_code . "</br>";
 $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
 
-$sql_code_s = "SELECT * FROM `servico` INNER JOIN statusservico ON servico.status = statusservico.ID WHERE status = 3 OR status = 4 AND profissional = $prof_ID";
+$sql_code_s = 'SELECT *,DATE_FORMAT(servico.data,"Data: %d/%m/%Y Hora: %h:%m") FROM `servico` INNER JOIN statusservico ON servico.status = statusservico.ID WHERE status = 3 OR status = 4 AND profissional ='. $prof_ID;
 //echo $sql_code_s;
 $sql_query_s = $mysqli->query($sql_code_s) or die("Falha na execução do código SQL: " . $mysqli->error);
 
@@ -74,8 +74,8 @@ $sql_query_s = $mysqli->query($sql_code_s) or die("Falha na execução do códig
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                    <h1 class="h3 mb-2 text-gray-800"> Produtos cadastrados </h1>
-                    <p class="mb-4"> Aqui você vê todos os produtos cadastrados no sistemas. </p>
+                    <h1 class="h3 mb-2 text-gray-800"> Historico de serviços </h1>
+                    <p class="mb-4"> Aqui você vê todos os serviços fechados atribuidos á você. </p>
                     </br>
                     <?php 
                     
@@ -101,6 +101,7 @@ $sql_query_s = $mysqli->query($sql_code_s) or die("Falha na execução do códig
                                                 echo '<p class="card-text" style="color: rgba(0, 183, 27, 0.8)"> Status: '. $row['nome'] .'</p>
                                                 <p class="card-text"> Valor serviço: R$'. $row['valServico'] .'</p>
                                                 <p class="card-title"> Descrição: '. $row['descricao'] .'</p>
+                                                <p class="card-title"> '. $row['DATE_FORMAT(servicovenda.data,"Data: %d/%m/%Y Hora: %h:%m")'] .'</p>
                                                 <form action="" method="post">
                                            
                                             </form> ';   
@@ -108,6 +109,7 @@ $sql_query_s = $mysqli->query($sql_code_s) or die("Falha na execução do códig
                                                 echo '<p class="card-text" style="color: rgba(245, 50, 39, 0.7)" > Status: '. $row['nome'] .'</p>
                                                 <p class="card-text"> Valor serviço: R$'. $row['valServico'] .'</p>
                                                 <p class="card-title"> Descrição: '. $row['descricao'] .'</p>
+                                                <p class="card-title">'. $row['DATE_FORMAT(servicovenda.data,"Data: %d/%m/%Y Hora: %h:%m")'] .'</p>
                                                 <form action="" method="post">
                                             
                                             </form> '; 
@@ -129,6 +131,7 @@ $sql_query_s = $mysqli->query($sql_code_s) or die("Falha na execução do códig
                                                 echo '<p class="card-text" style="color: rgba(0, 183, 27, 0.8)"> Status: '. $row['nome'] .'</p>
                                                 <p class="card-text"> Valor serviço: R$'. $row['valor'] .'</p>
                                                 <p class="card-title"> Descrição: '. $row['descricao'] .'</p>
+                                                <p class="card-title">'. $row['DATE_FORMAT(servico.data,"Data: %d/%m/%Y Hora: %h:%m")'] .'</p>
                                                 <form action="" method="post">
                                            
                                             </form> ';   
@@ -136,6 +139,7 @@ $sql_query_s = $mysqli->query($sql_code_s) or die("Falha na execução do códig
                                                 echo '<p class="card-text" style="color: rgba(245, 50, 39, 0.7)" > Status: '. $row['nome'] .'</p>
                                                 <p class="card-text"> Valor serviço: R$'. $row['valor'] .'</p>
                                                 <p class="card-title"> Descrição: '. $row['descricao'] .'</p>
+                                                <p class="card-title">' . $row['DATE_FORMAT(servico.data,"Data: %d/%m/%Y Hora: %h:%m")'] .'</p>
                                                 <form action="" method="post">
                                             
                                             </form> '; 

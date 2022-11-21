@@ -28,18 +28,19 @@ function cessao($nivel_cesso){
     }
 
 }
-
+//limpar_texto(" asdasdas 122,50 mdsfg");
 function limpar_texto($str){ 
-    return preg_replace("/[^0-9]/", "", $str); 
-  }
+    $str = preg_replace("/[^0-9]/", "", $str);
+    return substr_replace($str, '.', -2, 0);
+}
 
-
- 
-  function farmat_num($num){ 
+function farmat_num($num){ 
     return number_format($num, 2, '.', ''); 
-  }
+}
   
-
+function farmat_virgula($num){ 
+    return number_format($num, 2, ',', ''); 
+}
 
 
 ?>

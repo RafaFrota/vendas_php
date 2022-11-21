@@ -318,7 +318,7 @@ $sql_query_s = $mysqli->query($sql_code_s) or die("Falha na execução do códig
 
         
         if ( <?php echo $envio_form; ?> ) {
-            alert("Servico!");
+            
             window.history.replaceState( null, null, window.location.href );
         }
 
