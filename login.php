@@ -1,49 +1,113 @@
 <?php 
 
+// Ativar exibição de erros PHP
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 include('php/conexao.php');
 
+// Verificar conexão com o banco de dados
+if ($mysqli->connect_error) {
+    die("Erro de conexão com o banco: " . $mysqli->connect_error);
+}
+
+if(!isset($_SESSION)) {
+    session_start();
+}
+
+// Array para armazenar mensagens de erro e debug
+$errors = array();
+$debug_logs = array();
+
+// Função para adicionar logs de debug
+function addDebugLog($message, $type = 'info') {
+    global $debug_logs;
+    $debug_logs[] = array(
+        'type' => $type,
+        'message' => $message
+    );
+}
+
 if(isset($_POST['email']) || isset($_POST['senha'])) {
-
+    // Debug dos dados recebidos
+    addDebugLog('Dados recebidos - Login: ' . $_POST['email']);
+    
     if(strlen($_POST['email']) == 0) {
-        echo "Preencha seu e-mail";
+        $errors[] = "Preencha seu nome de usuário";
     } else if(strlen($_POST['senha']) == 0) {
-        echo "Preencha sua senha";
+        $errors[] = "Preencha sua senha";
     } else {
-
-        $email = $mysqli->real_escape_string($_POST['email']);
+        $login = $mysqli->real_escape_string($_POST['email']);
         $senha = $mysqli->real_escape_string($_POST['senha']);
 
-        $sql_code = "SELECT * FROM `user` WHERE nome = '$email' AND senha = '$senha'";
-        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+        $sql_code = "SELECT * FROM `user` WHERE nome = '$login' AND senha = '$senha'";
+        addDebugLog('Query SQL: ' . $sql_code);
 
-        $quantidade = $sql_query->num_rows;
-
-        if($quantidade == 1) {
-            
-            $usuario = $sql_query->fetch_assoc();
-
-            if(!isset($_SESSION)) {
-                session_start();
-            }
-
-            $_SESSION['id'] = $usuario['ID'];
-            $_SESSION['nome'] = $usuario['nome'];
-            $_SESSION['adm'] = $usuario['acesso'];
-
-           
-            if ($_SESSION['adm'] == 1) {
-                header("Location: index.php");
-            }else if($_SESSION['adm'] == 2){
-                header("Location: servicoativo.php");
-            }else{
-                header("Location: login.php");
-                echo $_SESSION['adm'];
-            }
-
+        $sql_query = $mysqli->query($sql_code);
+        
+        if (!$sql_query) {
+            $errors[] = "Erro na execução da query: " . $mysqli->error;
+            addDebugLog('Erro SQL: ' . $mysqli->error, 'error');
         } else {
-            echo "Falha ao logar! E-mail ou senha incorretos";
+            $quantidade = $sql_query->num_rows;
+            addDebugLog('Número de registros encontrados: ' . $quantidade);
+
+            if($quantidade == 1) {
+                $usuario = $sql_query->fetch_assoc();
+                addDebugLog('Dados do usuário: ' . json_encode($usuario));
+                
+                $_SESSION['id'] = $usuario['ID'];
+                $_SESSION['nome'] = $usuario['nome'];
+                $_SESSION['adm'] = $usuario['ADM'];
+                
+                addDebugLog('Nível de acesso: ' . $_SESSION['adm']);
+                
+                if ($_SESSION['adm'] == 1) {
+                    addDebugLog('Redirecionando para index.php - ADM');
+                    header("Location: index.php");
+                    exit();
+                } else if($_SESSION['adm'] == 2) {
+                    addDebugLog('Redirecionando para servicoativo.php - Usuário');
+                    header("Location: servicoativo.php");
+                    exit();
+                } else {
+                    $errors[] = "Nível de acesso inválido: " . $_SESSION['adm'];
+                    addDebugLog('Nível de acesso inválido: ' . $_SESSION['adm'], 'error');
+                    header("Location: login.php");
+                    exit();
+                }
+            } else {
+                $errors[] = "Falha ao logar! Nome de usuário ou senha incorretos";
+                addDebugLog('Tentativa de login falhou - Nenhum usuário encontrado', 'error');
+            }
         }
     }
+}
+
+// Exibir erros na tela
+if (!empty($errors)) {
+    echo '<div style="color: red; background-color: #ffe6e6; padding: 10px; margin: 10px; border: 1px solid red; border-radius: 5px;">';
+    foreach ($errors as $error) {
+        echo $error . "<br>";
+    }
+    echo '</div>';
+}
+
+// Adicionar script de debug no final da página
+if (!empty($debug_logs)) {
+    echo "<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const debugLogs = " . json_encode($debug_logs) . ";
+        debugLogs.forEach(function(log) {
+            if (log.type === 'error') {
+                console.error(log.message);
+            } else {
+                console.log(log.message);
+            }
+        });
+    });
+    </script>";
 }
 
 ?>
